@@ -1,8 +1,5 @@
 package com.ybg.rp.ua.themeStore
 
-import com.ybg.rp.manager.base.GoodsTypeOne
-import com.ybg.rp.manager.base.GoodsTypeTwo
-
 class ThemeStoreGoodsInfo {
 
     static belongsTo = [themeStore: ThemeStoreBaseInfo]

@@ -50,4 +50,5 @@ class VendMachineInfoController {
         }
         render map as JSON
     }
+
 }
