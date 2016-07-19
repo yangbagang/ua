@@ -31,6 +31,7 @@ ext {
 repositories {
     mavenLocal()
     maven { url "https://repo.grails.org/grails/core" }
+    maven { url "http://mvn.gt.igexin.com/nexus/content/repositories/releases/" }
 }
 
 dependencyManagement {
@@ -55,11 +56,15 @@ dependencies {
     console "org.grails:grails-console"
     profile "org.grails.profiles:web:3.1.5"
     runtime "org.grails.plugins:asset-pipeline"
-    runtime "com.h2database:h2"
+    runtime 'mysql:mysql-connector-java:5.1.39'
     testCompile "org.grails:grails-plugin-testing"
     testCompile "org.grails.plugins:geb"
     testRuntime "org.seleniumhq.selenium:selenium-htmlunit-driver:2.47.1"
     testRuntime "net.sourceforge.htmlunit:htmlunit:2.18"
+    compile 'org.grails.plugins:spring-security-core:3.1.1'
+    compile 'commons-codec:commons-codec:1.10'
+    compile "com.gexin.platform:gexin-rp-sdk-http:4.0.1.2"
+    compile "com.gexin.platform:gexin-rp-sdk-template:4.0.0.5"
 }
 
 task wrapper(type: Wrapper) {
