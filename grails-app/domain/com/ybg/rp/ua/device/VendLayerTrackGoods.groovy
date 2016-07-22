@@ -33,4 +33,6 @@ class VendLayerTrackGoods {
 
     /**轨道工作状态1：良好, 0：损坏*/
     Short workStatus
+
+    Short isCabinet
 }

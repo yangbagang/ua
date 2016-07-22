@@ -3,9 +3,12 @@ package com.ybg.rp.ua.themeStore
 import com.ybg.rp.ua.base.GoodsTypeTwo
 import com.ybg.rp.ua.device.VendLayerTrackGoods
 import com.ybg.rp.ua.device.VendMachineInfo
+import com.ybg.rp.ua.utils.PartnerUserUtil
 import grails.converters.JSON
 
 class ThemeStoreGoodsInfoController {
+
+    def themeStoreGoodsInfoService
 
     def listGoodsByTypeTwo(Long machineId, Long typeTwoId) {
         def machine = VendMachineInfo.get(machineId)//未来扩展用
@@ -26,4 +29,41 @@ class ThemeStoreGoodsInfoController {
         }
         render num
     }
+
+    /**
+     * 查询某个主题店符合关键词的所有在售商品。APP补货用。
+     * @param token
+     * @param themeStoreId
+     * @param keyWord
+     * @return
+     */
+    def queryGoodsByName(String token, Long themeStoreId, String keyWord) {
+        def map = [:]
+        if (PartnerUserUtil.checkTokenValid(token)) {
+            def themeStore = ThemeStoreBaseInfo.get(themeStoreId)
+            if (themeStore) {
+                def dataList = themeStoreGoodsInfoService.listGoodsByName(themeStore, keyWord)
+                map.dataList = dataList
+                map.success = true
+            } else {
+                map.success = false
+                map.message = "主题店不存在"
+            }
+        } else {
+            map.success = false
+            map.message = "为了您的账号安全，请重新登陆"
+        }
+        render map as JSON
+    }
+
+    /**
+     * 查询某个主题店的所有在售商品。APP补货用。
+     * @param token
+     * @param themeStoreId
+     * @return
+     */
+    def queryGoodsByThemeStoreId(String token, Long themeStoreId) {
+        queryGoodsByName(token, themeStoreId, null)
+    }
+
 }

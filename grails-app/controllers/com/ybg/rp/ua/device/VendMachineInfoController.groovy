@@ -116,6 +116,11 @@ class VendMachineInfoController {
                         goods.currentInventory = 0
                         goods.largestInventory = it.maxInventory
                         goods.workStatus = 1 as Short
+                        if (it.layerNo in ["1", "2", "3", "4", "5", "6"]) {//特殊数字,设定为格子柜。
+                            goods.isCabinet = 1 as Short
+                        } else {
+                            goods.isCabinet = 0 as Short
+                        }
                         goods.save flush: true
                     }
                     map.success = true

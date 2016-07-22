@@ -11,6 +11,7 @@ class OrderInfo {
         deliveryStatus nullable: true
         payWay nullable: true
         getWay nullable: true
+        transNo nullable: true
         peiSongMoney nullable: true
         confirmTime nullable: true
         completeTime nullable: true
@@ -26,7 +27,7 @@ class OrderInfo {
     /** 付款状态  */
     Short payStatus = 0 as Short //0:未付款 1:已付款
     /** 订单渠道 */
-    Short orderWay = 1 as Short  //0:线下 1:微信 2:WEB 3:APP
+    Short orderWay = 0 as Short  //0:线下 1:微信 2:WEB 3:APP
     /** 发货状态 */
     Short deliveryStatus = 0 as Short   //0:未发货 1:出货成功 2:出货失败
     /** 支付方式 */
@@ -42,8 +43,8 @@ class OrderInfo {
     Float userScore = 0
     Float realMoney = 0
     Date createTime
-    Date confirmTime
-    Date completeTime
+    Date confirmTime//支付时间
+    Date completeTime//出货时间
     Date quHuoTime
     Date peiSongTime
     String quHuoCode

@@ -18,4 +18,5 @@ class ThemeStoreGoodsInfo {
     String picId
     Short status
     Integer px
+    String letter
 }

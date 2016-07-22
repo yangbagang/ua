@@ -19,7 +19,6 @@ class ThemeStoreBaseInfoController {
             map.success = false
             map.msg = "登录凭据己失效,请重新登录。"
         }
-        response.setHeader("Access-Control-Allow-Origin", "*")
         render map as JSON
     }
 

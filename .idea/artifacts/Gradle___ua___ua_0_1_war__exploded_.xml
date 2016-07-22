@@ -24,6 +24,8 @@
           <element id="library" level="project" name="Gradle: org.hibernate:hibernate-ehcache:4.3.11.Final" />
           <element id="library" level="project" name="Gradle: org.grails.plugins:spring-security-core:3.1.1" />
           <element id="library" level="project" name="Gradle: commons-codec:commons-codec:1.10" />
+          <element id="library" level="project" name="Gradle: com.gexin.platform:gexin-rp-sdk-http:4.0.1.2" />
+          <element id="library" level="project" name="Gradle: com.gexin.platform:gexin-rp-sdk-template:4.0.0.5" />
           <element id="library" level="project" name="Gradle: ch.qos.logback:logback-classic:1.1.5" />
           <element id="library" level="project" name="Gradle: org.slf4j:jcl-over-slf4j:1.7.16" />
           <element id="library" level="project" name="Gradle: org.slf4j:jul-to-slf4j:1.7.16" />
@@ -70,6 +72,7 @@
           <element id="library" level="project" name="Gradle: net.sf.ehcache:ehcache:2.10.1" />
           <element id="library" level="project" name="Gradle: org.springframework.security:spring-security-core:4.0.3.RELEASE" />
           <element id="library" level="project" name="Gradle: org.springframework.security:spring-security-web:4.0.3.RELEASE" />
+          <element id="library" level="project" name="Gradle: com.gexin.platform:gexin-rp-sdk-base:4.0.0.7" />
           <element id="library" level="project" name="Gradle: ch.qos.logback:logback-core:1.1.5" />
           <element id="library" level="project" name="Gradle: commons-logging:commons-logging:1.2" />
           <element id="library" level="project" name="Gradle: org.springframework:spring-aop:4.2.5.RELEASE" />
@@ -107,6 +110,8 @@
           <element id="library" level="project" name="Gradle: antlr:antlr:2.7.7" />
           <element id="library" level="project" name="Gradle: org.jboss:jandex:1.1.0.Final" />
           <element id="library" level="project" name="Gradle: aopalliance:aopalliance:1.0" />
+          <element id="library" level="project" name="Gradle: org.codehaus.jackson:jackson-all:1.8.5" />
+          <element id="library" level="project" name="Gradle: com.google.protobuf:protobuf-java:2.5.0" />
           <element id="library" level="project" name="Gradle: org.apache.ant:ant:1.9.4" />
           <element id="library" level="project" name="Gradle: org.codehaus.groovy:groovy-groovydoc:2.4.6" />
           <element id="library" level="project" name="Gradle: org.apache.ant:ant-antlr:1.9.4" />
@@ -160,11 +165,7 @@
           <element id="library" level="project" name="Gradle: com.goldmansachs:gs-collections-api:5.1.0" />
           <element id="library" level="project" name="Gradle: net.minidev:asm:1.0.2" />
           <element id="library" level="project" name="Gradle: asm:asm:3.3.1" />
-          <element id="file-copy" path="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.gexin.platform/gexin-rp-sdk-http/4.0.1.2/638207040fb681b5228f5a69b8621232407061a9/gexin-rp-sdk-http-4.0.1.2.jar" />
-          <element id="file-copy" path="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.gexin.platform/gexin-rp-sdk-template/4.0.0.5/a09a48c881cbc8403e21c4fb703ca08d4891fbf5/gexin-rp-sdk-template-4.0.0.5.jar" />
-          <element id="file-copy" path="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.gexin.platform/gexin-rp-sdk-base/4.0.0.7/8857ecde4300e4fb55fe40f11a06d6f5bb0896c/gexin-rp-sdk-base-4.0.0.7.jar" />
-          <element id="file-copy" path="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.codehaus.jackson/jackson-all/1.8.5/a5549eaa90a63b20da244690f9ade851eaeb2d99/jackson-all-1.8.5.jar" />
-          <element id="file-copy" path="$MAVEN_REPOSITORY$/com/google/protobuf/protobuf-java/2.5.0/protobuf-java-2.5.0.jar" />
+          <element id="file-copy" path="$USER_HOME$/.gradle/caches/modules-2/files-2.1/Pingplusplus/pingpp-java/2.1.7/9350dfcbe5eb21415e1575ef162bb8e7d6496c5c/pingpp-java-2.1.7.jar" />
         </element>
       </element>
       <element id="directory" name="META-INF">
