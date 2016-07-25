@@ -7,6 +7,13 @@ import grails.plugin.springsecurity.authentication.encoding.BCryptPasswordEncode
 
 class PartnerUserInfoController {
 
+    /**
+     * 手机管理APP登录。用户名与密码获配时返回token。
+     * @param userName
+     * @param password
+     * @param loginDevice
+     * @return
+     */
     def login(String userName, String password, String loginDevice) {
         def map = [:]
         def userInfo = PartnerUserInfo.findByUsernameAndEnabled(userName, true)

@@ -12,7 +12,7 @@ class VendLayerTrackGoodsController {
     def partnerUserOperationLogService
 
     /**
-     * 初始化主机信息
+     * 商品管理模块,初始化主机信息。
      * @param themeStoreId
      * @param token
      * @return
@@ -70,7 +70,7 @@ class VendLayerTrackGoodsController {
     }
 
     /**
-     * 获取格子机数据
+     * 商品管理模块,获取格子机数据。
      * @param token
      * @param sid 格子机对应层id
      */
@@ -137,7 +137,7 @@ class VendLayerTrackGoodsController {
     }
 
     /**
-     * 打开指定格式柜门
+     * 打开指定格子柜门
      * @param token
      * @param trackNos
      */
@@ -190,7 +190,7 @@ class VendLayerTrackGoodsController {
     }
 
     /**
-     * 打开空柜门
+     * 打开所有空柜门
      * @param token
      * @param themeStoreId
      * @param sid 柜子格所在层ID
@@ -248,7 +248,7 @@ class VendLayerTrackGoodsController {
     }
 
     /**
-     * 交换位置
+     * 交换商品位置
      * @param token
      * @param data
      * @param themeStoreId

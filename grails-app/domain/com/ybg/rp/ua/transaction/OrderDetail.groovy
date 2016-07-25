@@ -7,6 +7,7 @@ class OrderDetail {
     static belongsTo = [order: OrderInfo]
 
     static constraints = {
+        goodsPic nullable: true
     }
 
     VendLayerTrackGoods goods

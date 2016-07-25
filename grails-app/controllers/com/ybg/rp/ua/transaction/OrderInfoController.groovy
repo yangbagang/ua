@@ -13,6 +13,8 @@ class OrderInfoController {
 
     def orderInfoService
 
+    def orderDetailService
+
     /**
      * 更新订单状况
      * @param orderNo
@@ -32,7 +34,7 @@ class OrderInfoController {
             render map as JSON
             return
         }
-        if ("0".equals(result)) {//取消订单
+        if ("0" == result) {//取消订单
             if (orderInfo.transNo) {
                 orderInfo.deliveryStatus = 1 as Short
             } else {
@@ -57,6 +59,8 @@ class OrderInfoController {
             if (isDataUp) {
                 orderInfoService.updateCurrentInventory(orderInfo)
             }
+            //更新订单详情为出货
+            orderDetailService.updateStatus(orderInfo, 3 as Short)
         } else if ("2".equals(result)) {//出货失败
             orderInfo.deliveryStatus = 2 as Short
         }
@@ -102,8 +106,8 @@ class OrderInfoController {
      * @return
      */
     @Transactional
-    def createOrderWithMchineIdAndGoodsJson(Long machine, String goodsJson) {
-        def map = orderInfoService.createOrder(machine, goodsJson)
+    def createOrderWithMachineIdAndGoodsJson(Long machineId, String goodsJson) {
+        def map = orderInfoService.createOrder(machineId, goodsJson)
         render map as JSON
     }
 

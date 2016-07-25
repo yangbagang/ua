@@ -77,6 +77,11 @@ class OrderInfoService {
                     orderDetail.errorStatus = 0 as Short
                     orderDetail.refundPrice = 0
                     orderDetail.save flush: true
+                    if (orderDetail.errors) {
+                        orderDetail.errors.each {
+                            println it
+                        }
+                    }
                     //构造返回结果
                     def goodsInfo = [:]//商品信息
                     goodsInfo.gid = layer.goods.id
@@ -84,7 +89,8 @@ class OrderInfoService {
                     goodsInfo.goodsName = layer.goods.name
                     goodsInfo.price = layer.goods.realPrice
                     goodsInfo.goodsDesc = layer.goods.specifications
-                    goodsInfo.kucun = layer.currentInventory
+                    goodsInfo.kucun = 1
+                    goodsInfo.num = 1
                     goodsInfo.trackNo = layer.orbitalNo
                     def order = [:]//订单信息
                     order.orderNo = orderInfo.orderNo
@@ -126,9 +132,9 @@ class OrderInfoService {
                 orderInfo.realMoney = 0
                 orderInfo.transNo = ""
                 def goodsVoList = []
-                goodsList.each { gid, num ->
-                    def remainNum = num
-                    def goods = ThemeStoreGoodsInfo.get(gid)
+                goodsList.each {
+                    def remainNum = Integer.valueOf(it.num)
+                    def goods = ThemeStoreGoodsInfo.get(Long.valueOf(it.gid))
                     def layers = VendLayerTrackGoods.findAllByVendMachineAndGoods(machine, goods)
                     for (VendLayerTrackGoods layer: layers) {
                         if (layer.currentInventory < 1) {
@@ -162,7 +168,8 @@ class OrderInfoService {
                         goodsInfo.goodsName = layer.goods.name
                         goodsInfo.price = layer.goods.realPrice
                         goodsInfo.goodsDesc = layer.goods.specifications
-                        goodsInfo.kucun = layer.currentInventory
+                        goodsInfo.kucun = takeNum
+                        goodsInfo.num = takeNum
                         goodsInfo.trackNo = layer.orbitalNo
                         goodsVoList.add(goodsInfo)
                         //检查数量
