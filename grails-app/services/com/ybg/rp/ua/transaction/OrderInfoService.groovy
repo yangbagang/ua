@@ -2,7 +2,11 @@ package com.ybg.rp.ua.transaction
 
 import com.ybg.rp.ua.device.VendLayerTrackGoods
 import com.ybg.rp.ua.device.VendMachineInfo
+import com.ybg.rp.ua.partner.PartnerBaseInfo
+import com.ybg.rp.ua.themeStore.ThemeStoreBaseInfo
 import com.ybg.rp.ua.themeStore.ThemeStoreGoodsInfo
+import com.ybg.rp.ua.themeStore.ThemeStoreOfPartner
+import com.ybg.rp.ua.utils.DateUtil
 import com.ybg.rp.ua.utils.OrderUtil
 import grails.transaction.Transactional
 import groovy.json.JsonSlurper
@@ -209,5 +213,73 @@ class OrderInfoService {
         transactionInfo.updateTime = new Date()
         transactionInfo.save flush: true
         orderInfo.save flush: true
+    }
+
+    def countMoney(PartnerBaseInfo partner, String themeIds, String startDate, String endDate) {
+        //查询范围
+        def themeStores
+        if (themeIds == null || "" == themeIds) {
+            themeStores = ThemeStoreOfPartner.findAllByPartner(partner)
+        } else {
+            themeStores = getThemeStores(themeIds)
+        }
+
+        def c = OrderInfo.createCriteria()
+        def money = c.get {
+            projections {
+                sum("realMoney")
+            }
+            and {
+                vendMachine{
+                    'in'("themeStore", themeStores)
+                }
+                gt("completeTime", DateUtil.getFromTime(startDate))
+                lt("completeTime", DateUtil.getToTime(endDate))
+                eq("payStatus", 1 as Short)
+            }
+        }
+        money ?: 0
+    }
+
+    def countOrderNum(PartnerBaseInfo partner, String themeIds, String startDate, String endDate) {
+        //查询范围
+        def themeStores
+        if (themeIds == null || "" == themeIds) {
+            themeStores = ThemeStoreOfPartner.findAllByPartner(partner)
+        } else {
+            themeStores = getThemeStores(themeIds)
+        }
+
+        def c = OrderInfo.createCriteria()
+        def count = c.get {
+            projections {
+                count("orderNo")
+            }
+            and {
+                vendMachine{
+                    'in'("themeStore", themeStores)
+                }
+                gt("completeTime", DateUtil.getFromTime(startDate))
+                lt("completeTime", DateUtil.getToTime(endDate))
+                eq("payStatus", 1 as Short)
+            }
+        }
+        count
+    }
+
+    private getThemeStores(String themeIds) {
+        def ids = []
+        def tIds = themeIds.split(",")
+        for (String id: tIds) {
+            if ("" != id) {
+                try {
+                    ids.add(Long.valueOf(id))
+                } catch (Exception e) {
+                    e.printStackTrace()
+                    //nothing
+                }
+            }
+        }
+        ThemeStoreBaseInfo.findAllByIdInList(ids)
     }
 }

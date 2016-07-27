@@ -27,6 +27,7 @@ class ThemeStoreBaseInfoController {
             map.success = false
             map.msg = "登录凭据己失效,请重新登录。"
         }
+
         render map as JSON
     }
 

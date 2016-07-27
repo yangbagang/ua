@@ -1,6 +1,8 @@
 package com.ybg.rp.ua.transaction
 
 import com.pingplusplus.model.Charge
+import com.ybg.rp.ua.partner.PartnerUserInfo
+import com.ybg.rp.ua.utils.PartnerUserUtil
 import com.ybg.rp.ua.utils.PingPlusUtil
 import grails.converters.JSON
 import grails.transaction.Transactional
@@ -207,4 +209,34 @@ class OrderInfoController {
         render map as JSON
     }
 
+    /**
+     * 统计一段时间内的销售情况及详情
+     * @param token
+     * @param themeIds
+     * @param startDate
+     * @param endDate
+     * @param pageSize
+     * @param pageNum
+     * @return
+     */
+    @Transactional(readOnly = true)
+    def listAmountAndDetail(String token, String themeIds, String startDate, String endDate, Integer pageSize, Integer pageNum) {
+        def map = [:]
+        if (PartnerUserUtil.checkTokenValid(token)) {
+            def user = PartnerUserInfo.get(PartnerUserUtil.getPartnerUserIdFromToken(token))
+            //查询订单详情
+            orderDetailService.listOrderDetail(user.parnterBaseInfo, map, themeIds, startDate, endDate, pageSize, pageNum)
+            //查询总共有多少钱
+            def totalMoney = orderInfoService.countMoney(user.parnterBaseInfo, themeIds, startDate, endDate)
+            //查询总共有几笔订单
+            def totalCount = orderInfoService.countOrderNum(user.parnterBaseInfo, themeIds, startDate, endDate)
+            map.saleCount = totalCount
+            map.salePrice = totalMoney
+            map.success = true
+        } else {
+            map.success = false
+            map.message = "为了您的账号安全，请重新登陆"
+        }
+        render map as JSON
+    }
 }
