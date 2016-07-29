@@ -40,4 +40,11 @@ class DateUtil {
         def now = sdf_full.format(new Date())
         now.split(" ")[1]
     }
+
+    static getYesterday() {
+        Calendar cal = Calendar.getInstance()
+        cal.set(Calendar.DAY_OF_YEAR, cal.get(Calendar.DAY_OF_YEAR) - 1)
+        def yestoday = sdf_full.format(cal.time)
+        yestoday.split(" ")[0]
+    }
 }
