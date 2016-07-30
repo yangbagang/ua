@@ -47,4 +47,11 @@ class DateUtil {
         def yestoday = sdf_full.format(cal.time)
         yestoday.split(" ")[0]
     }
+
+    static getBeforeDay(int days) {
+        Calendar cal = Calendar.getInstance()
+        cal.set(Calendar.DAY_OF_YEAR, cal.get(Calendar.DAY_OF_YEAR) - days)
+        def yestoday = sdf_full.format(cal.time)
+        yestoday.split(" ")[0]
+    }
 }
