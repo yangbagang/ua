@@ -10,6 +10,7 @@ import com.ybg.rp.ua.utils.DateUtil
 import com.ybg.rp.ua.utils.OrderUtil
 import grails.transaction.Transactional
 import groovy.json.JsonSlurper
+import groovy.transform.Synchronized
 
 @Transactional
 class OrderInfoService {
@@ -30,20 +31,23 @@ class OrderInfoService {
         }
     }
 
+    @Synchronized
     def updateCurrentInventory(OrderInfo orderInfo) {
         if (orderInfo) {
             def details = OrderDetail.findAllByOrder(orderInfo)
             for (OrderDetail detail : details) {
-                //update num
-                def layer = detail.goods
-                if (layer.currentInventory > detail.goodsNum) {
-                    layer.currentInventory = layer.currentInventory - detail.goodsNum
-                    layer.save flush: true
+                if (detail.status != (3 as Short)) {//防止重复扣库存
+                    //update num
+                    def layer = detail.goods
+                    if (layer.currentInventory > detail.goodsNum) {
+                        layer.currentInventory = layer.currentInventory - detail.goodsNum
+                        layer.save flush: true
+                    }
+                    //update status
+                    detail.status = 3 as Short
+                    detail.errorStatus = 0 as Short
+                    detail.save flush: true
                 }
-                //update status
-                detail.status = 3 as Short
-                detail.errorStatus = 0 as Short
-                detail.save flush: true
             }
         }
     }
@@ -238,7 +242,10 @@ class OrderInfoService {
                 eq("payStatus", 1 as Short)
             }
         }
-        money ?: 0
+        if (money) {
+            return money.round(2)
+        }
+        return 0
     }
 
     def countOrderNum(PartnerBaseInfo partner, String themeIds, String startDate, String endDate) {

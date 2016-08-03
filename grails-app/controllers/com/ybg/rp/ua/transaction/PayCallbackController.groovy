@@ -38,16 +38,16 @@ class PayCallbackController {
                     String transaction_no = chargeMap.get("transaction_no").toString();
                     // 支付成功-需要操作的步骤
                     TransactionInfo transactionInfo = TransactionInfo.findByChargeId(chargeMap.get("id").toString());
-                    if(transactionInfo?.isSuccess == 1){//如果已支付就不执行下面的操作
+                    if(transactionInfo?.isSuccess == (1 as Short)){//如果已支付就不执行下面的操作
                         response.setStatus(200);
                         return;
                     }
                     if (null != transactionInfo) {
                         /** 新增设置-存储支付账号 */
                         Map<String, Object> extraMap = (Map<String, Object>) chargeMap.get("extra");
-                        if ("1".equals(transactionInfo.payType)) {
+                        if ("1" == transactionInfo.payType) {
                             transactionInfo.payAccount = extraMap.get("buyer_account").toString();// 支付宝支付账号
-                        } else if ("2".equals(transactionInfo.payType)) {
+                        } else if ("2" == transactionInfo.payType) {
                             transactionInfo.payAccount = extraMap.get("open_id").toString();// 微信openid
                         }
                         //更新订单状态
