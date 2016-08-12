@@ -31,4 +31,28 @@ class ThemeStoreBaseInfoController {
         render map as JSON
     }
 
+    /**
+     * 列出某合作伙伴经营的所有主题店。不区分位置。
+     * @param token
+     * @param name
+     * @param latitude
+     * @param longitude
+     * @return
+     */
+    def listThemeStore(String token, String name) {
+        def map = [:]
+        //检查token是否有效
+        if (PartnerUserUtil.checkTokenValid(token)) {
+            if (name == null) {
+                name = ""
+            }
+            map = themeStoreBaseInfoService.findThemeStore(token, name)
+        } else {
+            map.success = false
+            map.msg = "登录凭据己失效,请重新登录。"
+        }
+
+        render map as JSON
+    }
+
 }

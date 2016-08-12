@@ -39,7 +39,7 @@ class OrderInfoService {
                 if (detail.status != (3 as Short)) {//防止重复扣库存
                     //update num
                     def layer = detail.goods
-                    if (layer.currentInventory > detail.goodsNum) {
+                    if (layer.currentInventory >= detail.goodsNum) {
                         layer.currentInventory = layer.currentInventory - detail.goodsNum
                         layer.save flush: true
                     }

@@ -34,10 +34,31 @@ class ThemeStoreBaseInfoService {
         map
     }
 
+    def findThemeStore(String token, String name) {
+        def map = [:]
+        def userId = PartnerUserUtil.getPartnerUserIdFromToken(token)
+        def partnerUser = PartnerUserInfo.get(userId)
+        if (partnerUser) {
+            //计算数量
+            def themeStores = ThemeStoreOfPartner.findAllByPartner(partnerUser.parnterBaseInfo)*.baseInfo
+            def voList = createVoList(themeStores, name, 0, 0)
+            voList?.sort {it.name}
+            //生成结果
+            map.dataList = voList
+            map.totalCount = voList?.size()
+            map.success = true
+            map.msg = ""
+        } else {
+            map.success = false
+            map.msg = "登录凭据己失效,请重新登录。"
+        }
+        map
+    }
+
     private createVoList(List<ThemeStoreBaseInfo> themeStoreBaseInfos, String name, Double latitude, Double longitude) {
         def list = []
         for (ThemeStoreBaseInfo storeBaseInfo : themeStoreBaseInfos) {
-            if (name == null || "".equals(name) || storeBaseInfo.name.contains(name)) {
+            if (name == null || "" == name || storeBaseInfo.name.contains(name)) {
                 def storeVo = new ThemeStoreVo()
                 storeVo.id = storeBaseInfo.id
                 storeVo.name = storeBaseInfo.name
