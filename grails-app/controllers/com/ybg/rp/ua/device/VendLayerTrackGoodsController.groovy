@@ -101,6 +101,7 @@ class VendLayerTrackGoodsController {
      * @return
      */
     def setTrackGoods(String token, String layerIds, Long goodsId) {
+        println "layerIds=${layerIds}"
         def map = [:]
         if (PartnerUserUtil.checkTokenValid(token)) {
             vendLayerTrackGoodsService.setTrackGoodsByLayerIds(layerIds, goodsId)
@@ -319,6 +320,26 @@ class VendLayerTrackGoodsController {
         } else {
             map.success = false
             map.msg = "参数不能为空"
+        }
+        render map as JSON
+    }
+
+    //获得指定轨道商品信息
+    def getLayerGoods(Long lid) {
+        def map = [:]
+        def goods = VendLayerTrackGoods.get(lid)
+        if (goods) {
+            map.sid = goods.id
+            map.sno = goods.orbitalNo
+            map.goodsName = goods.goods?.name
+            map.currentInventory = goods.currentInventory
+            map.largestInventory = goods.largestInventory
+            map.price = goods.goods?.realPrice
+            map.success = true
+            map.msg = ""
+        } else {
+            map.success =false
+            map.msg = "指定商品不存在。"
         }
         render map as JSON
     }

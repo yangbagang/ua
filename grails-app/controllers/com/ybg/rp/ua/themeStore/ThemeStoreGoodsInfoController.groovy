@@ -57,6 +57,32 @@ class ThemeStoreGoodsInfoController {
     }
 
     /**
+     * 查询某个主题店所有在售商品。APP补货用。
+     * @param token
+     * @param themeStoreId
+     * @param keyWord
+     * @return
+     */
+    def queryGoods(String token, Long themeStoreId) {
+        def map = [:]
+        if (PartnerUserUtil.checkTokenValid(token)) {
+            def themeStore = ThemeStoreBaseInfo.get(themeStoreId)
+            if (themeStore) {
+                def dataList = themeStoreGoodsInfoService.listGoods(themeStore)
+                map.dataList = dataList
+                map.success = true
+            } else {
+                map.success = false
+                map.message = "主题店不存在"
+            }
+        } else {
+            map.success = false
+            map.message = "为了您的账号安全，请重新登陆"
+        }
+        render map as JSON
+    }
+
+    /**
      * 查询某个主题店的所有在售商品。APP补货用。
      * @param token
      * @param themeStoreId
