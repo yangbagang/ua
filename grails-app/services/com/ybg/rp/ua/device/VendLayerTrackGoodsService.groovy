@@ -21,9 +21,9 @@ class VendLayerTrackGoodsService {
 
     @Transactional(readOnly = true)
     def listLayerTrackGoodsByTrackInfo(VendLayerTrackInfo trackInfo) {
-        def hql = "from VendLayerTrackGoods v where v.layer=? order by v.orbitalNo asc "
+        def hql = "from VendLayerTrackGoods v where v.layer=? and v.vendMachine=? order by v.orbitalNo asc "
         def data = []
-        VendLayerTrackGoods.executeQuery(hql, [trackInfo.layer]).each { trackGoods ->
+        VendLayerTrackGoods.executeQuery(hql, [trackInfo.layer, trackInfo.vendMachine]).each { trackGoods ->
             def map = [:]
             map.goodsName = trackGoods.goods?.name ?: ""
             map.standardPrice = trackGoods.goods?.realPrice ?: 0

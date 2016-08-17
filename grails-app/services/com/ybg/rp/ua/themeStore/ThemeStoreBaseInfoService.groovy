@@ -63,7 +63,6 @@ class ThemeStoreBaseInfoService {
                 storeVo.id = storeBaseInfo.id
                 storeVo.name = storeBaseInfo.name
                 storeVo.address = storeBaseInfo.building.address
-                storeVo.distance = GPSUtil.getDistance(latitude, longitude, storeBaseInfo.latitude, storeBaseInfo.longitude)
                 list.add(storeVo)
             }
         }

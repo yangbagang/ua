@@ -49,8 +49,9 @@ class OrderDetailService {
             def vo = [:]
             vo.detailId = detail.id
             vo.orderTime = detail.order.completeTime
-            println "vo.orderTime=${vo.orderTime}"
             vo.goodName = detail.goodsName
+            vo.goodNum = detail.goodsNum
+            vo.storeName = detail.goods?.vendMachine?.themeStore?.name
             vo.orbitalNo = detail.orbitalNo
             vo.price = detail.buyPrice
             vo.transWay = detail.order.payWay

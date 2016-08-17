@@ -45,6 +45,7 @@ class VendMachineInfoController {
      * @return
      */
     def updateLayerNo(Long machineId, Long operatorId, String layers) {//operatorId暂时不用
+        println "updateLayerNo: machineId=${machineId}, layers=${layers}"
         def map = [:]
         def vendMachineInfo = VendMachineInfo.get(machineId)
         if (vendMachineInfo) {
@@ -65,7 +66,12 @@ class VendMachineInfoController {
                         if (it.layerNo in ["1", "2", "3", "4", "5", "6"]) {//特殊数字,设定为格子柜。
                             layer.isCabinet = 1 as Short
                         } else {
-                            layer.isCabinet = 0 as Short
+                            def match = ~/(A|B|C|D).*/
+                            if (it.layerNo ==~ match) {//字母,设定为副柜。
+                                layer.isCabinet = 2 as Short
+                            } else {
+                                layer.isCabinet = 0 as Short
+                            }
                         }
                         layer.save flush: true
                     }
@@ -83,6 +89,7 @@ class VendMachineInfoController {
             map.success = false
             map.msg = "售卖机不存在"
         }
+        println map
         render map as JSON
     }
 
@@ -95,6 +102,7 @@ class VendMachineInfoController {
      * @return
      */
     def updateMaxNum(Long machineId, Long operatorId, String layerNo, String gsons) {//operatorId暂时不用
+        println "updateMaxNum: machineId=${machineId}, layerNo=${layerNo}, gsons=${gsons}"
         def map = [:]
         def vendMachineInfo = VendMachineInfo.get(machineId)
         if (vendMachineInfo && layerNo) {
@@ -102,16 +110,17 @@ class VendMachineInfoController {
                 def jsonSlurper = new JsonSlurper()
                 def layerVOs = jsonSlurper.parseText(gsons)
                 if (layerVOs) {
-                    //删除该层所有数据
-                    VendLayerTrackGoods.findAllByVendMachineAndLayer(vendMachineInfo, layerNo)?.each {
-                        it.delete flush: true
-                    }
-                    //新建该层数据
+                    //获取该层所有数据.TODO当某层轨道数减少时会出现异常
+                    //def trackGoods = VendLayerTrackGoods.findAllByVendMachineAndLayer(vendMachineInfo, layerNo)
+                    //检查该层数据
                     layerVOs.each {
-                        def goods = new VendLayerTrackGoods()
-                        goods.vendMachine = vendMachineInfo
+                        def goods = VendLayerTrackGoods.findByVendMachineAndOrbitalNo(vendMachineInfo, it.trackNo)
+                        if (!goods) {
+                            goods = new VendLayerTrackGoods()
+                            goods.vendMachine = vendMachineInfo
+                            goods.orbitalNo = it.trackNo
+                        }
                         goods.layer = layerNo
-                        goods.orbitalNo = it.trackNo
                         goods.sellStatus = 1 as Short
                         goods.currentInventory = 0
                         goods.largestInventory = it.maxInventory
@@ -119,7 +128,12 @@ class VendMachineInfoController {
                         if (it.layerNo in ["1", "2", "3", "4", "5", "6"]) {//特殊数字,设定为格子柜。
                             goods.isCabinet = 1 as Short
                         } else {
-                            goods.isCabinet = 0 as Short
+                            def match = ~/(A|B|C|D).*/
+                            if (it.layerNo ==~ match) {//字母,设定为副柜。
+                                goods.isCabinet = 2 as Short
+                            } else {
+                                goods.isCabinet = 0 as Short
+                            }
                         }
                         goods.save flush: true
                     }
@@ -137,6 +151,7 @@ class VendMachineInfoController {
             map.success = false
             map.msg = "参数错误"
         }
+        println map
         render map as JSON
     }
 

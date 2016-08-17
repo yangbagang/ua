@@ -101,7 +101,6 @@ class VendLayerTrackGoodsController {
      * @return
      */
     def setTrackGoods(String token, String layerIds, Long goodsId) {
-        println "layerIds=${layerIds}"
         def map = [:]
         if (PartnerUserUtil.checkTokenValid(token)) {
             vendLayerTrackGoodsService.setTrackGoodsByLayerIds(layerIds, goodsId)

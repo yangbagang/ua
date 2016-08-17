@@ -22,7 +22,7 @@ class DataAnalysisService {
             query += " and complete_time <= '${toDay} 23:59:59'"
         }
         def money = sql.firstRow(query).money
-        money ?: 0
+        money ? money.round(2) : 0
     }
 
     def gatherOrderNum(Long partnerId, String themeIds, String fromDay, String toDay) {
@@ -57,7 +57,7 @@ class DataAnalysisService {
         }
         query += " and pay_way > 0"
         def money = sql.firstRow(query).money
-        money ?: 0
+        money ? money.round(2) : 0
     }
 
     def gatherOnlineOrderNum(Long partnerId, String themeIds, String fromDay, String toDay) {
