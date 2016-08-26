@@ -166,13 +166,13 @@ class PingPlusUtil {
     static Map<String, byte[]> getInfo(HttpServletRequest request) throws Exception {
         Map<String, byte[]> map = new HashMap<String, byte[]>()
         request.setCharacterEncoding("UTF-8")
-        byte[] fileBytes = request.getHeader("x-pingplusplus-signature").getBytes()
+        byte[] fileBytes = request.getHeader("x-pingplusplus-signature")?.getBytes()
         String header = new String(fileBytes, "UTF-8")
         fileBytes = Base64.decodeBase64(header.getBytes())
         map.put("sign", fileBytes)
         BufferedReader reader = request.getReader()
         StringBuffer buffer = new StringBuffer()
-        String string
+        String string = ""
         while ((string = reader.readLine()) != null) {
             buffer.append(string)
         }

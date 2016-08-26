@@ -16,7 +16,7 @@ class PayCallbackController {
     def orderInfoService
 
     /**
-     * PING++支付回调 - Webhooks
+     * PING++支付回调 - Webhooks payCallback/callback
      */
     def callback() {
         Map<String, byte[]> map = PingPlusUtil.getInfo(request);
