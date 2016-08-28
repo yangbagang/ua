@@ -1,6 +1,7 @@
 package com.ybg.rp.ua.device
 
 import com.ybg.rp.ua.themeStore.ThemeStoreBaseInfo
+import com.ybg.rp.ua.themeStore.ThemeStoreGoodsInfo
 import com.ybg.rp.ua.utils.MsgPushHelper
 import com.ybg.rp.ua.utils.PartnerUserUtil
 import grails.converters.JSON
@@ -339,6 +340,64 @@ class VendLayerTrackGoodsController {
         } else {
             map.success =false
             map.msg = "指定商品不存在。"
+        }
+        render map as JSON
+    }
+
+    /**
+     * 获取主题店商品库存数量,方便准备补货。
+     * @param token
+     * @param storeId
+     */
+    def listThemeStoreGoods(String token, Long storeId) {
+        def map = [:]
+        if (PartnerUserUtil.checkTokenValid(token)) {
+            def themeStore = ThemeStoreBaseInfo.get(storeId)
+            if (themeStore) {
+                def machine = VendMachineInfo.findByThemeStoreAndIsReal(themeStore, 1 as Short)
+                if (machine) {
+                    def dataList = vendLayerTrackGoodsService.listGoodsByMachine(machine)
+                    map.message = ""
+                    map.success = true
+                    map.dataList = dataList
+                } else {
+                    map.message = "该主题店没有自助设备"
+                    map.success = false
+                }
+            } else {
+                map.message = "该主题店不存在"
+                map.success = false
+            }
+        } else {
+            map.success = false
+            map.message = "为了您的账号安全，请重新登陆"
+        }
+        render map as JSON
+    }
+
+    /**
+     * 获取某个商品具体的库存数量及所在轨道
+     * @param token
+     * @param goodsId
+     * @return
+     */
+    def listLayerGoods(String token, Long goodsId) {
+        def map = [:]
+        if (PartnerUserUtil.checkTokenValid(token)) {
+            def goods = ThemeStoreGoodsInfo.get(goodsId)
+            if (goods) {
+                def dataList = vendLayerTrackGoodsService.listLayerByGoods(goods)
+                map.message = ""
+                map.success = true
+                map.dataList = dataList
+                map.goodsName = goods.name
+            } else {
+                map.message = "该商品不存在"
+                map.success = false
+            }
+        } else {
+            map.success = false
+            map.message = "为了您的账号安全，请重新登陆"
         }
         render map as JSON
     }

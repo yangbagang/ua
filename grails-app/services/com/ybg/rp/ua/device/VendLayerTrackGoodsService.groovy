@@ -148,4 +148,49 @@ class VendLayerTrackGoodsService {
         map.success = true
         map
     }
+
+    def listGoodsByMachine(VendMachineInfo machineInfo) {
+        //查询
+        def c = VendLayerTrackGoods.createCriteria()
+        def results = c.list {
+            projections {
+                sum("currentInventory")
+                sum("largestInventory")
+                groupProperty("goods")
+            }
+            and {
+                eq("vendMachine", machineInfo)
+                ltProperty("currentInventory", "largestInventory")
+                isNotNull("goods")
+            }
+        }
+        //构造返回数据集
+        def list = []
+        for (Object object : results) {
+            Object[] obj = (Object[]) object
+            def num1 = Long.valueOf(obj[0])
+            def num2 = Long.valueOf(obj[1])
+            def goodsInfo = obj[2]
+            def vo = [:]
+            vo.gid = goodsInfo?.id
+            vo.num1 = num1
+            vo.num2 = num2
+            vo.goodsName = goodsInfo?.name
+            vo.storeName = machineInfo.themeStore.name
+            list.add(vo)
+        }
+        list
+    }
+
+    def listLayerByGoods(ThemeStoreGoodsInfo goods) {
+        //查询
+        def c = VendLayerTrackGoods.createCriteria()
+        def results = c.list {
+            and {
+                eq("goods", goods)
+                ltProperty("currentInventory", "largestInventory")
+            }
+        }
+        results
+    }
 }
