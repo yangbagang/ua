@@ -177,6 +177,7 @@ class PingPlusUtil {
             buffer.append(string)
         }
         reader.close()
+        println "buffer=$buffer"
         fileBytes = buffer.toString().getBytes()
         map.put("data", fileBytes)
         return map

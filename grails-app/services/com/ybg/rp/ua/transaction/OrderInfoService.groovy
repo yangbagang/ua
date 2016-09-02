@@ -103,7 +103,8 @@ class OrderInfoService {
                     def order = [:]//订单信息
                     order.orderNo = orderInfo.orderNo
                     order.orderMoney = orderInfo.realMoney
-                    order.orderInfos = [goodsInfo]
+                    order.orderInfos = [goodsInfo]//二选一,新版上线后删除此行。
+                    order.goodsInfo = [goodsInfo]
                     //返回结果
                     map.orderInfo = order
                     map.success = true
@@ -192,7 +193,8 @@ class OrderInfoService {
                 def order = [:]
                 order.orderNo = orderInfo.orderNo
                 order.orderMoney = orderInfo.realMoney
-                order.orderInfos = goodsVoList
+                order.orderInfos = goodsVoList//二选一,新版上线后删除此行。
+                order.goodsInfo = goodsVoList
                 //返回结果
                 map.orderInfo = order
                 map.success = true
