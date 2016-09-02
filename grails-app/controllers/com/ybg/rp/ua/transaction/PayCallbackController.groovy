@@ -30,7 +30,7 @@ class PayCallbackController {
             Event event = Webhooks.eventParse(new String(data, "UTF-8"));
             if ("charge.succeeded".equals(event.getType())) {
                 // 支付成功
-                Map<String, Object> chargeMap = (Map<String, Object>) event.getData().object;
+                Map<String, Object> chargeMap = (Map<String, Object>) event.data.object;
                 /**
                  * 根据ping++异步通知，如果支付成功，修改订单状态
                  * */
