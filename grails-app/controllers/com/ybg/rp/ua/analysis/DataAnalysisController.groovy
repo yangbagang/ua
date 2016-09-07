@@ -9,7 +9,13 @@ class DataAnalysisController {
 
     def dataAnalysisService
 
-    def queryTotalData(String token, String themeIds) {
+    /**
+     * 查询得到今日销售金额及次数
+     * @param token
+     * @param themeIds
+     * @return
+     */
+    def queryTodayData(String token, String themeIds) {
         def map = [:]
         if (PartnerUserUtil.checkTokenValid(token)) {
             def today = DateUtil.getToday()
@@ -28,25 +34,23 @@ class DataAnalysisController {
         render map as JSON
     }
 
-    def queryMoney(String token, String themeIds) {
+    /**
+     * 得到每小时的销售数据
+     * @param token
+     * @param themeIds
+     * @return
+     */
+    def queryHourData(String token, String themeIds) {
         def map = [:]
         if (PartnerUserUtil.checkTokenValid(token)){
             def user = PartnerUserInfo.get(PartnerUserUtil.getPartnerUserIdFromToken(token))
             //查询总共有多少钱
             def today = DateUtil.getToday()
-            def yesterday = DateUtil.getYesterday()
-            def todayMoney = dataAnalysisService.gatherMoneyNum(user.parnterBaseInfo.id, themeIds, today, today)
-            def yestMoney = dataAnalysisService.gatherMoneyNum(user.parnterBaseInfo.id, themeIds, yesterday, yesterday)
-            def onlineMoney = dataAnalysisService.gatherOnlineMoneyNum(user.parnterBaseInfo.id, themeIds, today, today)
-            def online = 0
-            if (todayMoney != 0) {
-                online = (int) (onlineMoney * 100 / todayMoney)
-            }
+            def moneyList = dataAnalysisService.gatherHoursMoneyNum(user.parnterBaseInfo.id, themeIds, today, today)
+            def countList = dataAnalysisService.gatherHoursGoodsNum(user.parnterBaseInfo.id, themeIds, today, today)
             map.success = true
-            map.todayMoney = todayMoney
-            map.yestMoney = yestMoney
-            map.online1 = online
-            map.online2 = 100 - online
+            map.moneyList = moneyList
+            map.countList = countList
         } else {
             map.success = false
             map.message = "为了您的账号安全，请重新登陆"
@@ -54,70 +58,15 @@ class DataAnalysisController {
         render map as JSON
     }
 
-    def queryCount(String token, String themeIds) {
-        def map = [:]
-        if (PartnerUserUtil.checkTokenValid(token)){
-            def user = PartnerUserInfo.get(PartnerUserUtil.getPartnerUserIdFromToken(token))
-            //查询总共有几笔订单
-            def today = DateUtil.getToday()
-            def yesterday = DateUtil.getYesterday()
-            def todayCount = dataAnalysisService.gatherOrderNum(user.parnterBaseInfo.id, themeIds, today, today)
-            def yestCount = dataAnalysisService.gatherOrderNum(user.parnterBaseInfo.id, themeIds, yesterday, yesterday)
-            def onlineCount = dataAnalysisService.gatherOnlineOrderNum(user.parnterBaseInfo.id, themeIds, today, today)
-            def online = 0
-            if (todayCount != 0) {
-                online = (int) (onlineCount * 100 / todayCount)
-            }
-            map.success = true
-            map.todayCount = todayCount
-            map.yestCount = yestCount
-            map.online1 = online
-            map.online2 = 100 - online
-        } else {
-            map.success = false
-            map.message = "为了您的账号安全，请重新登陆"
-        }
-        render map as JSON
-    }
-
-    def queryLineMoney(String token, String themeIds) {
-        def map = [:]
-        if (PartnerUserUtil.checkTokenValid(token)){
-            def user = PartnerUserInfo.get(PartnerUserUtil.getPartnerUserIdFromToken(token))
-            //查询总共有多少钱
-            def today = DateUtil.getToday()
-            def yesterday = DateUtil.getYesterday()
-            def todayMoney = dataAnalysisService.gatherHoursMoneyNum(user.parnterBaseInfo.id, themeIds, today, today)
-            def yesterdayMoney = dataAnalysisService.gatherHoursMoneyNum(user.parnterBaseInfo.id, themeIds, yesterday, yesterday)
-            map.success = true
-            map.todayMoney = todayMoney
-            map.yesterdayMoney = yesterdayMoney
-        } else {
-            map.success = false
-            map.message = "为了您的账号安全，请重新登陆"
-        }
-        render map as JSON
-    }
-
-    def queryLineCount(String token, String themeIds) {
-        def map = [:]
-        if (PartnerUserUtil.checkTokenValid(token)){
-            def user = PartnerUserInfo.get(PartnerUserUtil.getPartnerUserIdFromToken(token))
-            //查询总共有多少钱
-            def today = DateUtil.getToday()
-            def yesterday = DateUtil.getYesterday()
-            def todayCount = dataAnalysisService.gatherHoursOrderNum(user.parnterBaseInfo.id, themeIds, today, today)
-            def yesterdayCount = dataAnalysisService.gatherHoursOrderNum(user.parnterBaseInfo.id, themeIds, yesterday, yesterday)
-            map.success = true
-            map.todayCount = todayCount
-            map.yesterdayCount = yesterdayCount
-        } else {
-            map.success = false
-            map.message = "为了您的账号安全，请重新登陆"
-        }
-        render map as JSON
-    }
-
+    /**
+     * 查询得到昨天与今天的销售金额对比
+     * @param token
+     * @param themeIds
+     * @param orderBy
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
     def queryGoodsMoney(String token, String themeIds, String orderBy, Integer pageNum, Integer pageSize) {
         def map = [:]
         if (PartnerUserUtil.checkTokenValid(token)){
@@ -126,10 +75,8 @@ class DataAnalysisController {
             def today = DateUtil.getToday()
             def yesterday = DateUtil.getYesterday()
             def list = dataAnalysisService.queryGoodsMoney(user.parnterBaseInfo.id, themeIds, today, yesterday, orderBy, pageNum, pageSize)
-            map.success = false
+            map.success = true
             map.dataList = list
-            map.currPage = pageNum
-            map.totalPage = 10000//有多少页没有意义
         } else {
             map.success = false
             map.message = "为了您的账号安全，请重新登陆"
@@ -137,6 +84,15 @@ class DataAnalysisController {
         render map as JSON
     }
 
+    /**
+     * 查询得到昨天与今天的销售数量对比
+     * @param token
+     * @param themeIds
+     * @param orderBy
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
     def queryGoodsCount(String token, String themeIds, String orderBy, Integer pageNum, Integer pageSize) {
         def map = [:]
         if (PartnerUserUtil.checkTokenValid(token)){
@@ -145,10 +101,8 @@ class DataAnalysisController {
             def today = DateUtil.getToday()
             def yesterday = DateUtil.getYesterday()
             def list = dataAnalysisService.queryGoodsCount(user.parnterBaseInfo.id, themeIds, today, yesterday, orderBy, pageNum, pageSize)
-            map.success = false
+            map.success = true
             map.dataList = list
-            map.currPage = pageNum
-            map.totalPage = 10000//有多少页没有意义
         } else {
             map.success = false
             map.message = "为了您的账号安全，请重新登陆"
@@ -156,6 +110,12 @@ class DataAnalysisController {
         render map as JSON
     }
 
+    /**
+     * 对比昨天与前天的数据
+     * @param token
+     * @param themeIds
+     * @return
+     */
     def queryCompareData(String token, String themeIds) {
         def map = [:]
         if (PartnerUserUtil.checkTokenValid(token)) {
@@ -192,4 +152,65 @@ class DataAnalysisController {
         }
         render map as JSON
     }
+
+    /**
+     * 商品销售排行
+     * @param token
+     * @param themeIds
+     * @param orderBy 排序依据,count按销售数量降序。money按金额降序。
+     * @param fromDate
+     * @param toDate
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
+    def queryGoods(String token, String themeIds, String orderBy, String fromDate, String toDate, Integer pageNum, Integer pageSize) {
+        def map = [:]
+        if (PartnerUserUtil.checkTokenValid(token)){
+            def user = PartnerUserInfo.get(PartnerUserUtil.getPartnerUserIdFromToken(token))
+            //查询
+            def list = dataAnalysisService.queryGoods(user.parnterBaseInfo.id, themeIds, fromDate, toDate, orderBy, pageNum, pageSize)
+            map.success = true
+            map.dataList = list
+        } else {
+            map.success = false
+            map.message = "为了您的账号安全，请重新登陆"
+        }
+        render map as JSON
+    }
+
+    /**
+     * 商品分析
+     * @param token
+     * @param themeIds
+     * @param fromDate
+     * @param toDate
+     * @return
+     */
+    def goodsAnalysis(String token, String themeIds, String fromDate, String toDate) {
+        def map = [:]
+        if (PartnerUserUtil.checkTokenValid(token)){
+            def user = PartnerUserInfo.get(PartnerUserUtil.getPartnerUserIdFromToken(token))
+            //总金额
+            def totalMoney = dataAnalysisService.gatherMoneyNum(user.parnterBaseInfo.id, themeIds, fromDate, toDate)
+            //总件数
+            def totalCount = dataAnalysisService.gatherGoodsNum(user.parnterBaseInfo.id, themeIds, fromDate, toDate)
+            //金额前3名
+            def moneyList = dataAnalysisService.queryGoods(user.parnterBaseInfo.id, themeIds, fromDate, toDate, "money", 1, 3)
+            //件数前3名
+            def countList = dataAnalysisService.queryGoods(user.parnterBaseInfo.id, themeIds, fromDate, toDate, "count", 1, 3)
+            //构造结果
+            map.success = true
+            map.totalMoney = totalMoney
+            map.totalCount = totalCount
+            map.moneyList = moneyList
+            map.countList = countList
+            map.message = ""
+        } else {
+            map.success = false
+            map.message = "为了您的账号安全，请重新登陆"
+        }
+        render map as JSON
+    }
+
 }

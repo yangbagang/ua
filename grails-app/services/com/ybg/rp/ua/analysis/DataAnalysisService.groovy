@@ -39,12 +39,12 @@ class DataAnalysisService {
             query += " and complete_time <= '${toDay} 23:59:59'"
         }
         def orderNum = sql.firstRow(query).orderNum
-        orderNum
+        orderNum ?: 0
     }
 
-    def gatherOnlineMoneyNum(Long partnerId, String themeIds, String fromDay, String toDay) {
+    def gatherGoodsNum(Long partnerId, String themeIds, String fromDay, String toDay) {
         def sql = new Sql(dataSource)
-        def query = "select sum(goods_num*buy_price) as money from data_analysis " +
+        def query = "select sum(goods_num) as goodsNum from data_analysis " +
                 "where partner_id=" + partnerId
         if (themeIds != null && themeIds != "") {
             query += " and theme_store_id in (${themeIds})"
@@ -55,32 +55,13 @@ class DataAnalysisService {
         if (toDay != null && toDay != "") {
             query += " and complete_time <= '${toDay} 23:59:59'"
         }
-        query += " and pay_way > 0"
-        def money = sql.firstRow(query).money
-        money ? money.round(2) : 0
-    }
-
-    def gatherOnlineOrderNum(Long partnerId, String themeIds, String fromDay, String toDay) {
-        def sql = new Sql(dataSource)
-        def query = "select count(distinct order_no) as orderNum from data_analysis " +
-                "where partner_id=" + partnerId
-        if (themeIds != null && themeIds != "") {
-            query += " and theme_store_id in (${themeIds})"
-        }
-        if (fromDay != null && fromDay != "") {
-            query += " and complete_time >= '${fromDay} 00:00:00'"
-        }
-        if (toDay != null && toDay != "") {
-            query += " and complete_time <= '${toDay} 23:59:59'"
-        }
-        query += " and pay_way > 0"
-        def orderNum = sql.firstRow(query).orderNum
-        orderNum
+        def goodsNum = sql.firstRow(query).goodsNum
+        goodsNum ?: 0
     }
 
     def gatherHoursMoneyNum(Long partnerId, String themeIds, String fromDay, String toDay) {
         def sql = new Sql(dataSource)
-        def query = "select complete_hour,buy_price,goods_num from data_analysis " +
+        def query = "select complete_hour as hour,round(sum(buy_price*goods_num),2) as money from data_analysis " +
                 "where partner_id=" + partnerId
         if (themeIds != null && themeIds != "") {
             query += " and theme_store_id in (${themeIds})"
@@ -91,32 +72,13 @@ class DataAnalysisService {
         if (toDay != null && toDay != "") {
             query += " and complete_time <= '${toDay} 23:59:59'"
         }
-        def money1 = 0
-        def money2 = 0
-        def money3 = 0
-        def money4 = 0
-        sql.eachRow(query) { row ->
-            if (row.complete_hour <= 6) {
-                money1 += row.buy_price * row.goods_num
-            } else if (row.complete_hour <= 12) {
-                money2 += row.buy_price * row.goods_num
-            } else if (row.complete_hour <= 18) {
-                money3 += row.buy_price * row.goods_num
-            } else {
-                money4 += row.buy_price * row.goods_num
-            }
-        }
-
-        def list = [["timeSlot": 1, "money": money1],
-                     ["timeSlot": 2, "money": money2],
-                     ["timeSlot": 3, "money": money3],
-                     ["timeSlot": 4, "money": money4]]
-        list
+        query += " group by complete_hour order by complete_hour asc"
+        sql.rows(query)
     }
 
-    def gatherHoursOrderNum(Long partnerId, String themeIds, String fromDay, String toDay) {
+    def gatherHoursGoodsNum(Long partnerId, String themeIds, String fromDay, String toDay) {
         def sql = new Sql(dataSource)
-        def query = "select complete_hour as completeHour,count(distinct order_no) as num" +
+        def query = "select complete_hour as hour,sum(goods_num) as num" +
                 " from data_analysis where partner_id=" + partnerId
         if (themeIds != null && themeIds != "") {
             query += " and theme_store_id in (${themeIds})"
@@ -127,71 +89,22 @@ class DataAnalysisService {
         if (toDay != null && toDay != "") {
             query += " and complete_time <= '${toDay} 23:59:59'"
         }
-        query += " group by order_no"
-        def count1 = 0
-        def count2 = 0
-        def count3 = 0
-        def count4 = 0
-        sql.eachRow(query) { row ->
-            if (row.completeHour <= 6) {
-                count1 += row.num
-            } else if (row.completeHour <= 12) {
-                count2 += row.num
-            } else if (row.completeHour <= 18) {
-                count3 += row.num
-            } else {
-                count4 += row.num
-            }
-        }
-        def list = [["timeSlot": 1, "money": count1],
-                     ["timeSlot": 2, "money": count2],
-                     ["timeSlot": 3, "money": count3],
-                     ["timeSlot": 4, "money": count4]]
-        list
+        query += " group by complete_hour order by complete_hour asc"
+        sql.rows(query)
     }
 
     def queryGoodsMoney(Long partnerId, String themeIds, String today, String yesterday, String orderBy, Integer pageNum, Integer pageSize) {
         def sql = new Sql(dataSource)
         def query = """
-                    select a.`goods_pic` as goodsPic,a.`theme_store_goods_id` as gid,a.`goods_name` as goodsName,
-                    b.money as transMoney1, c.money as transMoney2
+                    select distinct a.goods_name as goodsName,
+                    ifnull(b.money, 0) as money1, ifnull(c.money, 0) as money2
                     from data_analysis a
                     left join
-                    (select theme_store_goods_id as goodsId, sum(buy_price*goods_num) as money
+                    (select theme_store_goods_id as goodsId, round(sum(buy_price*goods_num),2) as money
                     from data_analysis where date(complete_time)='${today}' group by theme_store_goods_id) b
                     on a.theme_store_goods_id = b.goodsId
                     left join
-                    (select theme_store_goods_id as goodsId, sum(buy_price*goods_num) as money
-                    from data_analysis where date(complete_time)='${yesterday}' group by theme_store_goods_id) c
-                    on a.theme_store_goods_id = c.goodsId
-                    where 1=1
-                    """
-        if (themeIds != null && themeIds != "") {
-            query += " and a.theme_store_id in (${themeIds})"
-        }
-        if (partnerId != null &&  partnerId != 0) {
-            query += " and a.partner_id = ${partnerId}"
-        }
-        if (orderBy != "desc") {
-            query += " order by b.money desc"
-        } else {
-            query += " order by b.money asc"
-        }
-        sql.rows(query, (pageNum - 1) * pageSize, pageSize)
-    }
-
-    def queryGoodsCount(Long partnerId, String themeIds, String today, String yesterday, String orderBy, Integer pageNum, Integer pageSize) {
-        def sql = new Sql(dataSource)
-        def query = """
-                    select a.`goods_pic` as goodsPic,a.`theme_store_goods_id` as gid,a.`goods_name` as goodsName,
-                    b.transCn as transCn1, c.transCn as transCn2
-                    from data_analysis a
-                    left join
-                    (select theme_store_goods_id as goodsId, sum(goods_num) as transCn
-                    from data_analysis where date(complete_time)='${today}' group by theme_store_goods_id) b
-                    on a.theme_store_goods_id = b.goodsId
-                    left join
-                    (select theme_store_goods_id as goodsId, sum(goods_num) as transCn
+                    (select theme_store_goods_id as goodsId, round(sum(buy_price*goods_num),2) as money
                     from data_analysis where date(complete_time)='${yesterday}' group by theme_store_goods_id) c
                     on a.theme_store_goods_id = c.goodsId
                     where 1=1
@@ -203,11 +116,62 @@ class DataAnalysisService {
             query += " and a.partner_id = ${partnerId}"
         }
         if (orderBy != "asc") {
-            query += " order by b.transCn desc"
+            query += " order by b.money desc"
         } else {
-            query += " order by b.transCn asc"
+            query += " order by b.money asc"
         }
         sql.rows(query, (pageNum - 1) * pageSize, pageSize)
     }
 
+    def queryGoodsCount(Long partnerId, String themeIds, String today, String yesterday, String orderBy, Integer pageNum, Integer pageSize) {
+        def sql = new Sql(dataSource)
+        def query = """
+                    select distinct a.goods_name as goodsName,
+                    ifnull(b.num, 0) as num1, ifnull(c.num, 0) as num2
+                    from data_analysis a
+                    left join
+                    (select theme_store_goods_id as goodsId, sum(goods_num) as num
+                    from data_analysis where date(complete_time)='${today}' group by theme_store_goods_id) b
+                    on a.theme_store_goods_id = b.goodsId
+                    left join
+                    (select theme_store_goods_id as goodsId, sum(goods_num) as num
+                    from data_analysis where date(complete_time)='${yesterday}' group by theme_store_goods_id) c
+                    on a.theme_store_goods_id = c.goodsId
+                    where 1=1
+                    """
+        if (themeIds != null && themeIds != "") {
+            query += " and a.theme_store_id in (${themeIds})"
+        }
+        if (partnerId != null &&  partnerId != 0) {
+            query += " and a.partner_id = ${partnerId}"
+        }
+        if (orderBy != "asc") {
+            query += " order by b.num desc"
+        } else {
+            query += " order by b.num asc"
+        }
+        sql.rows(query, (pageNum - 1) * pageSize, pageSize)
+    }
+
+    def queryGoods(Long partnerId, String themeIds, String fromDay, String toDay, String orderBy, Integer pageNum, Integer pageSize) {
+        def sql = new Sql(dataSource)
+        def query = "select goods_name,round(sum(buy_price*goods_num),2) as money, sum(goods_num) as num from data_analysis " +
+                "where partner_id=" + partnerId
+        if (themeIds != null && themeIds != "") {
+            query += " and theme_store_id in (${themeIds})"
+        }
+        if (fromDay != null && fromDay != "") {
+            query += " and complete_time >= '${fromDay} 00:00:00'"
+        }
+        if (toDay != null && toDay != "") {
+            query += " and complete_time <= '${toDay} 23:59:59'"
+        }
+        query += " group by goods_name"
+        if (orderBy == "count") {
+            query += " order by num desc"
+        } else {
+            query += " order by money desc"
+        }
+        sql.rows(query, (pageNum - 1) * pageSize, pageSize)
+    }
 }

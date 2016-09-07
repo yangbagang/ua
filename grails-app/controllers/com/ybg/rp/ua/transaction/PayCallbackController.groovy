@@ -1,5 +1,6 @@
 package com.ybg.rp.ua.transaction
 
+import com.pingplusplus.model.Charge
 import com.pingplusplus.model.Event
 import com.pingplusplus.model.Webhooks
 import com.ybg.rp.ua.base.PushMsgBaseVo
@@ -27,24 +28,23 @@ class PayCallbackController {
         // 不进行 签名校验
         flag = true;
         if (flag) {
-            Event event = Webhooks.eventParse(new String(data, "UTF-8"));
-            if ("charge.succeeded".equals(event.getType())) {
-                // 支付成功
-                Map<String, Object> chargeMap = (Map<String, Object>) event.data.object;
+            Object obj = Webhooks.getObject(new String(data, "UTF-8"));
+            if (obj instanceof Charge) {
+                Charge charge = (Charge) obj;
                 /**
                  * 根据ping++异步通知，如果支付成功，修改订单状态
                  * */
-                if (StringUtils.equals(chargeMap.get("paid").toString(), "true")) {
-                    String transaction_no = chargeMap.get("transaction_no").toString();
+                if (charge.paid) {//己经支付
+                    String transaction_no = charge.transactionNo
                     // 支付成功-需要操作的步骤
-                    TransactionInfo transactionInfo = TransactionInfo.findByChargeId(chargeMap.get("id").toString());
+                    TransactionInfo transactionInfo = TransactionInfo.findByChargeId(charge.id);
                     if(transactionInfo?.isSuccess == (1 as Short)){//如果已支付就不执行下面的操作
                         response.setStatus(200);
                         return;
                     }
                     if (null != transactionInfo) {
                         /** 新增设置-存储支付账号 */
-                        Map<String, Object> extraMap = (Map<String, Object>) chargeMap.get("extra");
+                        Map<String, Object> extraMap = charge.extra
                         if ("1" == transactionInfo.payType) {
                             transactionInfo.payAccount = extraMap.get("buyer_account").toString();// 支付宝支付账号
                         } else if ("2" == transactionInfo.payType) {
@@ -81,16 +81,16 @@ class PayCallbackController {
                         def clientId = vendMachineInfo.clientId
                         def content = pushOrderVo as JSON
                         MsgPushHelper msgPushHelper = new MsgPushHelper();
-                        if(msgPushHelper.sendMsg(clientId, content)){
-                            println "新机器个推开门 ----->操作成功"
+                        if(msgPushHelper.sendMsg(clientId, content as String)){
+                            println "回调推送开门 ----->操作成功"
                         }else {
-                            println "个推开门 ----->开门失败"
+                            println "回调推送开门 ----->开门失败"
                         }
                     } else {
-                        println "----没有找到改订单数据----" + chargeMap.get("id").toString()
+                        println "----没有找到改订单数据----" + charge.id
                     }
                 } else {
-                    println "----PING++ 交易失败----" + chargeMap.get("id").toString()
+                    println "----PING++ 交易失败----" + charge.id
                 }
                 response.setStatus(200);
             } else {
