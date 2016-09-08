@@ -121,14 +121,13 @@ class OrderInfoController {
         def map = [:]
         def orderInfo = OrderInfo.findByOrderNo(orderSn)
         if (orderInfo) {
-            def transNo = orderInfo.transNo
-            if (transNo != null && !"".equals(transNo)) {//有交易号代表己经支付
+            if (orderInfo.payStatus == (1 as Short)) {//己经支付
                 map.success = true
                 map.isPay = true
                 map.deliveryStatus = orderInfo.deliveryStatus
                 map.payWay = orderInfo.payWay
             } else {
-                //未查到交易号,有可能是ping++没有回调webhook
+                //未支付,有可能是ping++没有回调webhook
                 //此处进行主动查询,如果己经支付则更新状态并返回
                 def transaction = TransactionInfo.findByOrderNo(orderSn)
                 if (transaction) {
@@ -137,9 +136,9 @@ class OrderInfoController {
                         Charge charge = PingPlusUtil.retrieve(transaction.chargeId)
                         if (charge.getPaid()) {
                             Map<String, String> extraMap = charge.getExtra()
-                            if ("1".equals(transaction.payType)) {
+                            if ("1" == transaction.payType) {
                                 transaction.payAccount = extraMap.get("buyer_account")// 支付宝支付账号
-                            } else if ("2".equals(transaction.payType)) {
+                            } else if ("2" == transaction.payType) {
                                 transaction.payAccount = extraMap.get("open_id")// 微信openid
                             }
                             //更新订单状态

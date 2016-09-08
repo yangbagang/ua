@@ -1,14 +1,12 @@
 package com.ybg.rp.ua.transaction
 
 import com.pingplusplus.model.Charge
-import com.pingplusplus.model.Event
 import com.pingplusplus.model.Webhooks
 import com.ybg.rp.ua.base.PushMsgBaseVo
 import com.ybg.rp.ua.device.VendMachineInfo
 import com.ybg.rp.ua.utils.MsgPushHelper
 import com.ybg.rp.ua.utils.PingPlusUtil
 import grails.converters.JSON
-import org.apache.commons.lang.StringUtils
 
 import java.security.PublicKey
 
@@ -72,9 +70,10 @@ class PayCallbackController {
                             order.price = orderDetail.buyPrice
                             order.goodsDesc = orderDetail.goodsSpec
                             /**设置属性 end***/
-                            orderInfos.add(orderInfo);
+                            orderInfos.add(order);
                         }
-                        pushOrderVo.orderInfos = orderInfos
+                        pushOrderVo.orderInfos = orderInfos//二选一,新版上线后删除此行。//TODO
+                        pushOrderVo.goodsInfo = orderInfos
                         pushOrderVo.type = PushMsgBaseVo.TYPE_OPEN_OFFLINE
                         VendMachineInfo vendMachineInfo = orderInfo.vendMachine
                         //个推
