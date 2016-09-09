@@ -213,4 +213,221 @@ class DataAnalysisController {
         render map as JSON
     }
 
+    /**
+     * 用户分析。查询出新用户数量，购买次数，金额等。
+     * @param token
+     * @param themeIds
+     * @param fromDate
+     * @param toDate
+     * @return
+     */
+    def userAnalysis(String token, String themeIds, String fromDate, String toDate) {
+        def map = [:]
+        if (PartnerUserUtil.checkTokenValid(token)){
+            def user = PartnerUserInfo.get(PartnerUserUtil.getPartnerUserIdFromToken(token))
+            //总金额
+            def totalMoney = dataAnalysisService.gatherMoneyNum(user.parnterBaseInfo.id, themeIds, fromDate, toDate)
+            //总次数
+            def totalCount = dataAnalysisService.gatherOrderNum(user.parnterBaseInfo.id, themeIds, fromDate, toDate)
+            //总用户数
+            def totalUser = dataAnalysisService.gatherUserNum(user.parnterBaseInfo.id, themeIds, fromDate, toDate)
+            //新用户数
+            def newUserNum = dataAnalysisService.queryNewUserNum(user.parnterBaseInfo.id, themeIds, fromDate, toDate)
+            //新用户消费金额
+            def newUserMoney = dataAnalysisService.queryNewUserMoney(user.parnterBaseInfo.id, themeIds, fromDate, toDate)
+            //新用户购买次数
+            def newUserCount = dataAnalysisService.queryNewUserOrder(user.parnterBaseInfo.id, themeIds, fromDate, toDate)
+            //构造结果
+            map.success = true
+            map.totalMoney = totalMoney
+            map.totalCount = totalCount
+            map.totalUser = totalUser
+            map.newUserNum = newUserNum
+            map.newUserMoney = newUserMoney
+            map.newUserCount = newUserCount
+            map.message = ""
+        } else {
+            map.success = false
+            map.message = "为了您的账号安全，请重新登陆"
+        }
+        render map as JSON
+    }
+
+    /**
+     * 查询消费金额分布
+     * @param token
+     * @param themeIds
+     * @param fromDate
+     * @param toDate
+     * @return
+     */
+    def moneyAnalysis(String token, String themeIds, String fromDate, String toDate) {
+        def map = [:]
+        if (PartnerUserUtil.checkTokenValid(token)){
+            def user = PartnerUserInfo.get(PartnerUserUtil.getPartnerUserIdFromToken(token))
+            //查询
+            def dataList = dataAnalysisService.queryMoneyNum(user.parnterBaseInfo.id, themeIds, fromDate, toDate)
+            //构造结果
+            map.success = true
+            map.dataList = dataList
+            map.message = ""
+        } else {
+            map.success = false
+            map.message = "为了您的账号安全，请重新登陆"
+        }
+        render map as JSON
+    }
+
+    /**
+     * 查询购买次数分布
+     * @param token
+     * @param themeIds
+     * @param fromDate
+     * @param toDate
+     * @return
+     */
+    def numberAnalysis(String token, String themeIds, String fromDate, String toDate) {
+        def map = [:]
+        if (PartnerUserUtil.checkTokenValid(token)){
+            def user = PartnerUserInfo.get(PartnerUserUtil.getPartnerUserIdFromToken(token))
+            //查询
+            def dataList = dataAnalysisService.queryNumberNum(user.parnterBaseInfo.id, themeIds, fromDate, toDate)
+            //构造结果
+            map.success = true
+            map.dataList = dataList
+            map.message = ""
+        } else {
+            map.success = false
+            map.message = "为了您的账号安全，请重新登陆"
+        }
+        render map as JSON
+    }
+
+    /**
+     * 查询各支付方式总次数
+     * @param token
+     * @param themeIds
+     * @param fromDate
+     * @param toDate
+     * @return
+     */
+    def payAnalysis(String token, String themeIds, String fromDate, String toDate) {
+        def map = [:]
+        if (PartnerUserUtil.checkTokenValid(token)){
+            def user = PartnerUserInfo.get(PartnerUserUtil.getPartnerUserIdFromToken(token))
+            //支付方式
+            def dataList = dataAnalysisService.queryPayWayNum(user.parnterBaseInfo.id, themeIds, fromDate, toDate)
+            //构造结果
+            map.success = true
+            map.dataList = dataList
+            map.message = ""
+        } else {
+            map.success = false
+            map.message = "为了您的账号安全，请重新登陆"
+        }
+        render map as JSON
+    }
+
+    /**
+     * 查询各主题店销售数据，以金额降序排列
+     * @param token
+     * @param themeIds
+     * @param fromDate
+     * @param toDate
+     * @return
+     */
+    def queryThemeStoreData(String token, String themeIds, String fromDate, String toDate) {
+        def map = [:]
+        if (PartnerUserUtil.checkTokenValid(token)){
+            def user = PartnerUserInfo.get(PartnerUserUtil.getPartnerUserIdFromToken(token))
+            //支付方式
+            def dataList = dataAnalysisService.queryStoreData(user.parnterBaseInfo.id, themeIds, fromDate, toDate)
+            //构造结果
+            map.success = true
+            map.dataList = dataList
+            map.message = ""
+        } else {
+            map.success = false
+            map.message = "为了您的账号安全，请重新登陆"
+        }
+        render map as JSON
+    }
+
+    /**
+     * 生成销售次数折线图
+     * @param token
+     * @param themeIds
+     * @param fromDate
+     * @param toDate
+     */
+    def storeCount(String token, String themeIds, String fromDate, String toDate) {
+        def map = [:]
+        if (PartnerUserUtil.checkTokenValid(token)){
+            def user = PartnerUserInfo.get(PartnerUserUtil.getPartnerUserIdFromToken(token))
+            //获得店名称
+            def nameList = dataAnalysisService.queryStoreName(user.parnterBaseInfo.id, themeIds, fromDate, toDate)
+            //获得日期列表
+            def dayList = dataAnalysisService.queryCompleteDay(user.parnterBaseInfo.id, themeIds, fromDate, toDate)
+            def dataList = []
+            //分别获取每个店的数据
+            def data
+            for (String name: nameList) {
+                data = [:]
+                data.name = name
+                data.type = 'line'
+                data.data = dataAnalysisService.queryStoreCount(name, fromDate, toDate)
+                dataList.add(data)
+            }
+            //构造结果
+            map.success = true
+            map.nameList = nameList
+            map.dayList = dayList
+            map.dataList = dataList
+            map.message = ""
+        } else {
+            map.success = false
+            map.message = "为了您的账号安全，请重新登陆"
+        }
+        render map as JSON
+    }
+
+    /**
+     * 生成销售金额折线图
+     * @param token
+     * @param themeIds
+     * @param fromDate
+     * @param toDate
+     * @return
+     */
+    def storeMoney(String token, String themeIds, String fromDate, String toDate) {
+        def map = [:]
+        if (PartnerUserUtil.checkTokenValid(token)){
+            def user = PartnerUserInfo.get(PartnerUserUtil.getPartnerUserIdFromToken(token))
+            //获得店名称
+            def nameList = dataAnalysisService.queryStoreName(user.parnterBaseInfo.id, themeIds, fromDate, toDate)
+            //获得日期列表
+            def dayList = dataAnalysisService.queryCompleteDay(user.parnterBaseInfo.id, themeIds, fromDate, toDate)
+            def dataList = []
+            //分别获取每个店的数据
+            def data
+            for (String name: nameList) {
+                data = [:]
+                data.name = name
+                data.type = 'line'
+                data.data = dataAnalysisService.queryStoreMoney(name, fromDate, toDate)
+                dataList.add(data)
+            }
+            //构造结果
+            map.success = true
+            map.nameList = nameList
+            map.dayList = dayList
+            map.dataList = dataList
+            map.message = ""
+        } else {
+            map.success = false
+            map.message = "为了您的账号安全，请重新登陆"
+        }
+        render map as JSON
+    }
+
 }
