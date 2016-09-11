@@ -3,6 +3,7 @@ package com.ybg.rp.ua.device
 import com.ybg.rp.ua.base.PushMsgBaseVo
 import com.ybg.rp.ua.partner.LoginPushVo
 import com.ybg.rp.ua.partner.PartnerUserInfo
+import com.ybg.rp.ua.partner.PartnerUserStore
 import com.ybg.rp.ua.themeStore.ThemeStoreBaseInfo
 import com.ybg.rp.ua.themeStore.ThemeStoreOfPartner
 import com.ybg.rp.ua.utils.MsgPushHelper
@@ -254,7 +255,7 @@ class VendMachineInfoController {
                 def machineCount = 0
                 def faultCount = 0
                 def replenishCount = 0
-                def themeStores = ThemeStoreOfPartner.findAllByPartner(partnerUser.parnterBaseInfo)*.baseInfo
+                def themeStores = PartnerUserStore.findAllByUser(partnerUser)*.store
                 //循环查看每家店机器数量以及是否有错,是否需要补货。
                 for (ThemeStoreBaseInfo themeStore : themeStores) {
                     def machines = VendMachineInfo.findAllByThemeStoreAndIsReal(themeStore, 1 as Short)
@@ -312,7 +313,7 @@ class VendMachineInfoController {
                 def machine = VendMachineInfo.findByMachineCode(vmCode)
                 if (machine) {
                     def themeStore = machine.themeStore
-                    if (partnerUser.parnterBaseInfo.equals(ThemeStoreOfPartner.findByBaseInfo(themeStore).partner)) {
+                    if (partnerUser.parnterBaseInfo == ThemeStoreOfPartner.findByBaseInfo(themeStore).partner) {
                         String clientId = machine.clientId
                         LoginPushVo loginVo = new LoginPushVo()
                         loginVo.type = LoginPushVo.TYPE_LOGIN_TS
@@ -364,7 +365,7 @@ class VendMachineInfoController {
                 def machine = VendMachineInfo.findByMachineCode(vmCode)
                 if (machine) {
                     def themeStore = machine.themeStore
-                    if (partnerUser.parnterBaseInfo.equals(ThemeStoreOfPartner.findByBaseInfo(themeStore).partner)) {
+                    if (partnerUser.parnterBaseInfo == ThemeStoreOfPartner.findByBaseInfo(themeStore).partner) {
                         String clientId = machine.clientId
                         LoginPushVo loginVo = new LoginPushVo()
                         loginVo.type = LoginPushVo.TYPE_LOGIN

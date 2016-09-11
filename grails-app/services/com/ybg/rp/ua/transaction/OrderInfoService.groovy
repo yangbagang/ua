@@ -3,6 +3,8 @@ package com.ybg.rp.ua.transaction
 import com.ybg.rp.ua.device.VendLayerTrackGoods
 import com.ybg.rp.ua.device.VendMachineInfo
 import com.ybg.rp.ua.partner.PartnerBaseInfo
+import com.ybg.rp.ua.partner.PartnerUserInfo
+import com.ybg.rp.ua.partner.PartnerUserStore
 import com.ybg.rp.ua.themeStore.ThemeStoreBaseInfo
 import com.ybg.rp.ua.themeStore.ThemeStoreGoodsInfo
 import com.ybg.rp.ua.themeStore.ThemeStoreOfPartner
@@ -221,11 +223,11 @@ class OrderInfoService {
         orderInfo.save flush: true
     }
 
-    def countMoney(PartnerBaseInfo partner, String themeIds, String startDate, String endDate) {
+    def countMoney(PartnerUserInfo userInfo, String themeIds, String startDate, String endDate) {
         //查询范围
         def themeStores
         if (themeIds == null || "" == themeIds) {
-            themeStores = ThemeStoreOfPartner.findAllByPartner(partner)
+            themeStores = PartnerUserStore.findAllByUser(userInfo)*.store
         } else {
             themeStores = getThemeStores(themeIds)
         }
@@ -250,11 +252,11 @@ class OrderInfoService {
         return 0
     }
 
-    def countOrderNum(PartnerBaseInfo partner, String themeIds, String startDate, String endDate) {
+    def countOrderNum(PartnerUserInfo userInfo, String themeIds, String startDate, String endDate) {
         //查询范围
         def themeStores
         if (themeIds == null || "" == themeIds) {
-            themeStores = ThemeStoreOfPartner.findAllByPartner(partner)
+            themeStores = PartnerUserStore.findAllByUser(userInfo)*.store
         } else {
             themeStores = getThemeStores(themeIds)
         }

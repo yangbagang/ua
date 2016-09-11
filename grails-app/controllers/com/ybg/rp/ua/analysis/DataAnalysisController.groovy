@@ -20,6 +20,10 @@ class DataAnalysisController {
         if (PartnerUserUtil.checkTokenValid(token)) {
             def today = DateUtil.getToday()
             def user = PartnerUserInfo.get(PartnerUserUtil.getPartnerUserIdFromToken(token))
+            //检查参数
+            if (themeIds == null || "" == themeIds) {
+                themeIds = dataAnalysisService.getStoreIds(user.id)
+            }
             //查询总共有多少钱
             def totalMoney = dataAnalysisService.gatherMoneyNum(user.parnterBaseInfo.id, themeIds, today, today)
             //查询总共有几笔订单
@@ -44,6 +48,10 @@ class DataAnalysisController {
         def map = [:]
         if (PartnerUserUtil.checkTokenValid(token)){
             def user = PartnerUserInfo.get(PartnerUserUtil.getPartnerUserIdFromToken(token))
+            //检查参数
+            if (themeIds == null || "" == themeIds) {
+                themeIds = dataAnalysisService.getStoreIds(user.id)
+            }
             //查询总共有多少钱
             def today = DateUtil.getToday()
             def moneyList = dataAnalysisService.gatherHoursMoneyNum(user.parnterBaseInfo.id, themeIds, today, today)
@@ -71,6 +79,10 @@ class DataAnalysisController {
         def map = [:]
         if (PartnerUserUtil.checkTokenValid(token)){
             def user = PartnerUserInfo.get(PartnerUserUtil.getPartnerUserIdFromToken(token))
+            //检查参数
+            if (themeIds == null || "" == themeIds) {
+                themeIds = dataAnalysisService.getStoreIds(user.id)
+            }
             //查询
             def today = DateUtil.getToday()
             def yesterday = DateUtil.getYesterday()
@@ -97,6 +109,10 @@ class DataAnalysisController {
         def map = [:]
         if (PartnerUserUtil.checkTokenValid(token)){
             def user = PartnerUserInfo.get(PartnerUserUtil.getPartnerUserIdFromToken(token))
+            //检查参数
+            if (themeIds == null || "" == themeIds) {
+                themeIds = dataAnalysisService.getStoreIds(user.id)
+            }
             //查询总共有多少钱
             def today = DateUtil.getToday()
             def yesterday = DateUtil.getYesterday()
@@ -119,9 +135,14 @@ class DataAnalysisController {
     def queryCompareData(String token, String themeIds) {
         def map = [:]
         if (PartnerUserUtil.checkTokenValid(token)) {
+            def user = PartnerUserInfo.get(PartnerUserUtil.getPartnerUserIdFromToken(token))
+            //检查参数
+            if (themeIds == null || "" == themeIds) {
+                themeIds = dataAnalysisService.getStoreIds(user.id)
+            }
+            //准备参数
             def zt = DateUtil.getBeforeDay(1)//昨天
             def qt = DateUtil.getBeforeDay(2)//前天
-            def user = PartnerUserInfo.get(PartnerUserUtil.getPartnerUserIdFromToken(token))
             //查询总共有多少钱
             def ztMoney = dataAnalysisService.gatherMoneyNum(user.parnterBaseInfo.id, themeIds, zt, zt)
             def qtMoney = dataAnalysisService.gatherMoneyNum(user.parnterBaseInfo.id, themeIds, qt, qt)
@@ -168,6 +189,10 @@ class DataAnalysisController {
         def map = [:]
         if (PartnerUserUtil.checkTokenValid(token)){
             def user = PartnerUserInfo.get(PartnerUserUtil.getPartnerUserIdFromToken(token))
+            //检查参数
+            if (themeIds == null || "" == themeIds) {
+                themeIds = dataAnalysisService.getStoreIds(user.id)
+            }
             //查询
             def list = dataAnalysisService.queryGoods(user.parnterBaseInfo.id, themeIds, fromDate, toDate, orderBy, pageNum, pageSize)
             map.success = true
@@ -191,6 +216,10 @@ class DataAnalysisController {
         def map = [:]
         if (PartnerUserUtil.checkTokenValid(token)){
             def user = PartnerUserInfo.get(PartnerUserUtil.getPartnerUserIdFromToken(token))
+            //检查参数
+            if (themeIds == null || "" == themeIds) {
+                themeIds = dataAnalysisService.getStoreIds(user.id)
+            }
             //总金额
             def totalMoney = dataAnalysisService.gatherMoneyNum(user.parnterBaseInfo.id, themeIds, fromDate, toDate)
             //总件数
@@ -225,6 +254,10 @@ class DataAnalysisController {
         def map = [:]
         if (PartnerUserUtil.checkTokenValid(token)){
             def user = PartnerUserInfo.get(PartnerUserUtil.getPartnerUserIdFromToken(token))
+            //检查参数
+            if (themeIds == null || "" == themeIds) {
+                themeIds = dataAnalysisService.getStoreIds(user.id)
+            }
             //总金额
             def totalMoney = dataAnalysisService.gatherMoneyNum(user.parnterBaseInfo.id, themeIds, fromDate, toDate)
             //总次数
@@ -265,6 +298,10 @@ class DataAnalysisController {
         def map = [:]
         if (PartnerUserUtil.checkTokenValid(token)){
             def user = PartnerUserInfo.get(PartnerUserUtil.getPartnerUserIdFromToken(token))
+            //检查参数
+            if (themeIds == null || "" == themeIds) {
+                themeIds = dataAnalysisService.getStoreIds(user.id)
+            }
             //查询
             def dataList = dataAnalysisService.queryMoneyNum(user.parnterBaseInfo.id, themeIds, fromDate, toDate)
             //构造结果
@@ -290,6 +327,10 @@ class DataAnalysisController {
         def map = [:]
         if (PartnerUserUtil.checkTokenValid(token)){
             def user = PartnerUserInfo.get(PartnerUserUtil.getPartnerUserIdFromToken(token))
+            //检查参数
+            if (themeIds == null || "" == themeIds) {
+                themeIds = dataAnalysisService.getStoreIds(user.id)
+            }
             //查询
             def dataList = dataAnalysisService.queryNumberNum(user.parnterBaseInfo.id, themeIds, fromDate, toDate)
             //构造结果
@@ -315,6 +356,10 @@ class DataAnalysisController {
         def map = [:]
         if (PartnerUserUtil.checkTokenValid(token)){
             def user = PartnerUserInfo.get(PartnerUserUtil.getPartnerUserIdFromToken(token))
+            //检查参数
+            if (themeIds == null || "" == themeIds) {
+                themeIds = dataAnalysisService.getStoreIds(user.id)
+            }
             //支付方式
             def dataList = dataAnalysisService.queryPayWayNum(user.parnterBaseInfo.id, themeIds, fromDate, toDate)
             //构造结果
@@ -340,6 +385,10 @@ class DataAnalysisController {
         def map = [:]
         if (PartnerUserUtil.checkTokenValid(token)){
             def user = PartnerUserInfo.get(PartnerUserUtil.getPartnerUserIdFromToken(token))
+            //检查参数
+            if (themeIds == null || "" == themeIds) {
+                themeIds = dataAnalysisService.getStoreIds(user.id)
+            }
             //支付方式
             def dataList = dataAnalysisService.queryStoreData(user.parnterBaseInfo.id, themeIds, fromDate, toDate)
             //构造结果
@@ -364,6 +413,10 @@ class DataAnalysisController {
         def map = [:]
         if (PartnerUserUtil.checkTokenValid(token)){
             def user = PartnerUserInfo.get(PartnerUserUtil.getPartnerUserIdFromToken(token))
+            //检查参数
+            if (themeIds == null || "" == themeIds) {
+                themeIds = dataAnalysisService.getStoreIds(user.id)
+            }
             //获得店名称
             def nameList = dataAnalysisService.queryStoreName(user.parnterBaseInfo.id, themeIds, fromDate, toDate)
             //获得日期列表
@@ -403,6 +456,10 @@ class DataAnalysisController {
         def map = [:]
         if (PartnerUserUtil.checkTokenValid(token)){
             def user = PartnerUserInfo.get(PartnerUserUtil.getPartnerUserIdFromToken(token))
+            //检查参数
+            if (themeIds == null || "" == themeIds) {
+                themeIds = dataAnalysisService.getStoreIds(user.id)
+            }
             //获得店名称
             def nameList = dataAnalysisService.queryStoreName(user.parnterBaseInfo.id, themeIds, fromDate, toDate)
             //获得日期列表

@@ -55,7 +55,7 @@ class OrderInfoController {
                 }
             }
             orderInfo.completeTime = new Date()
-        } else if ("1".equals(result)) {//出货成功
+        } else if ("1" == result) {//出货成功
             orderInfo.deliveryStatus = 1 as Short
             orderInfo.completeTime = sdf.parse(transDate)
             if (isDataUp) {
@@ -63,7 +63,7 @@ class OrderInfoController {
             }
             //更新订单详情为出货
             orderDetailService.updateStatus(orderInfo, 3 as Short)
-        } else if ("2".equals(result)) {//出货失败
+        } else if ("2" == result) {//出货失败
             orderInfo.deliveryStatus = 2 as Short
         }
         orderInfo.save flush: true
@@ -224,11 +224,11 @@ class OrderInfoController {
         if (PartnerUserUtil.checkTokenValid(token)) {
             def user = PartnerUserInfo.get(PartnerUserUtil.getPartnerUserIdFromToken(token))
             //查询订单详情
-            orderDetailService.listOrderDetail(user.parnterBaseInfo, map, themeIds, startDate, endDate, pageSize, pageNum)
+            orderDetailService.listOrderDetail(user, map, themeIds, startDate, endDate, pageSize, pageNum)
             //查询总共有多少钱
-            def totalMoney = orderInfoService.countMoney(user.parnterBaseInfo, themeIds, startDate, endDate)
+            def totalMoney = orderInfoService.countMoney(user, themeIds, startDate, endDate)
             //查询总共有几笔订单
-            def totalCount = orderInfoService.countOrderNum(user.parnterBaseInfo, themeIds, startDate, endDate)
+            def totalCount = orderInfoService.countOrderNum(user, themeIds, startDate, endDate)
             map.saleCount = totalCount
             map.salePrice = totalMoney
             map.success = true

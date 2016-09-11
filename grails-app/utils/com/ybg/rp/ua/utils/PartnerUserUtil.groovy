@@ -30,4 +30,13 @@ class PartnerUserUtil {
         def key = container.find{it.value == token}?.key
         return key
     }
+
+    public static boolean removeToken(String token) {
+        if (container.containsValue(token)) {
+            def key = getPartnerUserIdFromToken(token)
+            return container.remove(key, token)
+        }
+        return false;
+    }
+
 }

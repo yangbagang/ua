@@ -47,5 +47,26 @@ class PartnerUserInfoController {
         render map as JSON
     }
 
+    /**
+     * 退出系统, 移除token。
+     * @param token
+     * @return
+     */
+    def logout(String token) {
+        def map = [:]
+        if (token) {
+            if (PartnerUserUtil.removeToken(token)) {
+                map.success = true
+                map.msg = "退出成功。"
+            } else {
+                map.success = false
+                map.msg = "退出失败。"
+            }
+        } else {
+            map.success = false
+            map.msg = "参数不能为空。"
+        }
+        render map as JSON
+    }
 
 }

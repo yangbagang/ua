@@ -20,6 +20,17 @@ class PartnerUserInfo {
 
     transient springSecurityService
 
+    transient String roles
+
+    String getRoles() {
+        def authorities = PartnerUserAuthority.findAllByUser(this)*.authority
+        if (authorities) {
+            authorities*.authority.join(",")
+        } else {
+            ""
+        }
+    }
+
     /** 用户名*/
     String username
     String realName

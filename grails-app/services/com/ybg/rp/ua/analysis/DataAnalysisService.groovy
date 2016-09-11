@@ -448,4 +448,13 @@ class DataAnalysisService {
         numList
     }
 
+    def getStoreIds(Long userId) {
+        def sql = new Sql(dataSource)
+        def query = "select store_id as storeId from partner_user_store where user_id=${userId}"
+        def result = "0"
+        sql.eachRow(query) { row ->
+            result += ",${row.storeId}"
+        }
+        result
+    }
 }

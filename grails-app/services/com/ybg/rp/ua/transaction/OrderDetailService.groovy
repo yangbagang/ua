@@ -1,6 +1,8 @@
 package com.ybg.rp.ua.transaction
 
 import com.ybg.rp.ua.partner.PartnerBaseInfo
+import com.ybg.rp.ua.partner.PartnerUserInfo
+import com.ybg.rp.ua.partner.PartnerUserStore
 import com.ybg.rp.ua.themeStore.ThemeStoreBaseInfo
 import com.ybg.rp.ua.themeStore.ThemeStoreOfPartner
 import com.ybg.rp.ua.utils.DateUtil
@@ -19,11 +21,11 @@ class OrderDetailService {
         }
     }
 
-    def listOrderDetail(PartnerBaseInfo partner, Map map, String themeIds, String startDate, String endDate, Integer pageSize, Integer pageNum) {
+    def listOrderDetail(PartnerUserInfo userInfo, Map map, String themeIds, String startDate, String endDate, Integer pageSize, Integer pageNum) {
         //查询范围
         def themeStores
         if (themeIds == null || "" == themeIds) {
-            themeStores = ThemeStoreOfPartner.findAllByPartner(partner)
+            themeStores = PartnerUserStore.findAllByUser(userInfo)*.store
         } else {
             themeStores = getThemeStores(themeIds)
         }
