@@ -93,11 +93,12 @@ class OrderInfoController {
      * 售卖机上单选某个商品生成订单。
      * @param machineId
      * @param trackNo
+     * @param yhCode
      * @return
      */
     @Transactional
-    def createOrderWithMachineIdAndTrackNo(Long machineId, String trackNo) {
-        def map = orderInfoService.createOrderWithSingleGoods(machineId, trackNo)
+    def createOrderWithMachineIdAndTrackNo(Long machineId, String trackNo, String yhCode) {
+        def map = orderInfoService.createOrderWithSingleGoods(machineId, trackNo, yhCode)
         render map as JSON
     }
 
@@ -105,11 +106,12 @@ class OrderInfoController {
      * 购物车购买
      * @param machine
      * @param goodsJson
+     * @param yhCode
      * @return
      */
     @Transactional
-    def createOrderWithMachineIdAndGoodsJson(Long machineId, String goodsJson) {
-        def map = orderInfoService.createOrder(machineId, goodsJson)
+    def createOrderWithMachineIdAndGoodsJson(Long machineId, String goodsJson, String yhCode) {
+        def map = orderInfoService.createOrder(machineId, goodsJson, yhCode)
         render map as JSON
     }
 

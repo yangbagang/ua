@@ -1,14 +1,13 @@
-package com.ybg.rp.ua.transaction
+package com.ybg.rp.ua.marketing
 
-import com.ybg.rp.ua.analysis.DataAnalysisController
 import grails.test.mixin.TestFor
 import spock.lang.Specification
 
 /**
  * See the API for {@link grails.test.mixin.web.ControllerUnitTestMixin} for usage instructions
  */
-@TestFor(DataAnalysisController)
-class DataAnalysisControllerSpec extends Specification {
+@TestFor(CouponController)
+class CouponControllerSpec extends Specification {
 
     def setup() {
     }

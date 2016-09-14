@@ -54,7 +54,7 @@ class OrderInfoService {
         }
     }
 
-    def createOrderWithSingleGoods(Long machineId, String trackNo) {
+    def createOrderWithSingleGoods(Long machineId, String trackNo, String yhCode) {
         def map = [:]
         def machine = VendMachineInfo.get(machineId)
         if (machine) {
@@ -126,7 +126,7 @@ class OrderInfoService {
         return map
     }
 
-    def createOrder(Long machineId, String goodsJson) {
+    def createOrder(Long machineId, String goodsJson, String yhCode) {
         def map = [:]
         def machine = VendMachineInfo.get(machineId)
         if (machine) {
