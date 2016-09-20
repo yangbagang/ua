@@ -133,6 +133,7 @@ class VendLayerTrackGoodsService {
             vo.goodsName = goodsInfo.name
             vo.goodsDesc = goodsInfo.specifications
             vo.goodsPic = goodsInfo.picId
+            vo.yhEnable = goodsInfo.yhEnable
             list.add(vo)
         }
         //构造分页结果

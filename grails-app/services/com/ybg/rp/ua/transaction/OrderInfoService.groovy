@@ -2,6 +2,7 @@ package com.ybg.rp.ua.transaction
 
 import com.ybg.rp.ua.device.VendLayerTrackGoods
 import com.ybg.rp.ua.device.VendMachineInfo
+import com.ybg.rp.ua.marketing.Coupon
 import com.ybg.rp.ua.partner.PartnerBaseInfo
 import com.ybg.rp.ua.partner.PartnerUserInfo
 import com.ybg.rp.ua.partner.PartnerUserStore
@@ -61,6 +62,8 @@ class OrderInfoService {
             def layer = VendLayerTrackGoods.findByVendMachineAndOrbitalNo(machine, trackNo)
             if (layer) {
                 if (layer.currentInventory > 0) {
+                    //优惠卷
+                    def coupon = Coupon.findByCodeAndFlag(yhCode, 1 as Short)
                     //创建订单
                     def orderInfo = new OrderInfo()
                     orderInfo.vendMachine = machine
@@ -68,9 +71,16 @@ class OrderInfoService {
                     orderInfo.createTime = new Date()
                     orderInfo.orderMoney = layer.goods.realPrice
                     orderInfo.totalMoney = layer.goods.realPrice
-                    orderInfo.realMoney = layer.goods.realPrice
+                    //计算实际价格
+                    def realMoney = getRealPrice(layer.goods, coupon)
+                    orderInfo.realMoney = realMoney
+                    orderInfo.youHuiJuan = orderInfo.totalMoney - orderInfo.realMoney
                     orderInfo.transNo = ""
+                    if (coupon) {
+                        orderInfo.yhCode = yhCode
+                    }
                     orderInfo.save flush: true
+
                     //创建订单详情
                     def orderDetail = new OrderDetail()
                     orderDetail.order = orderInfo
@@ -78,7 +88,7 @@ class OrderInfoService {
                     orderDetail.goodsNum = 1
                     orderDetail.goodsPrice = layer.goods.realPrice
                     orderDetail.discount = 0
-                    orderDetail.buyPrice = orderDetail.goodsPrice
+                    orderDetail.buyPrice = realMoney
                     orderDetail.goodsName = layer.goods.name
                     orderDetail.goodsSpec = layer.goods.specifications
                     orderDetail.goodsPic = layer.goods.picId
@@ -87,17 +97,13 @@ class OrderInfoService {
                     orderDetail.errorStatus = 0 as Short
                     orderDetail.refundPrice = 0
                     orderDetail.save flush: true
-                    if (orderDetail.errors) {
-                        orderDetail.errors.each {
-                            println it
-                        }
-                    }
+
                     //构造返回结果
                     def goodsInfo = [:]//商品信息
                     goodsInfo.gid = layer.goods.id
                     goodsInfo.goodsPic = layer.goods.picId
                     goodsInfo.goodsName = layer.goods.name
-                    goodsInfo.price = layer.goods.realPrice
+                    goodsInfo.price = realMoney
                     goodsInfo.goodsDesc = layer.goods.specifications
                     goodsInfo.kucun = 1
                     goodsInfo.num = 1
@@ -111,6 +117,11 @@ class OrderInfoService {
                     map.orderInfo = order
                     map.success = true
                     map.msg = "下单成功"
+                    //优惠卷己经使用
+                    if (coupon) {
+                        coupon.flag = 0 as Short
+                        coupon.save(flush: true)
+                    }
                 } else {
                     map.success = false
                     map.msg = "库存不足"
@@ -126,13 +137,35 @@ class OrderInfoService {
         return map
     }
 
+    private Float getRealPrice(ThemeStoreGoodsInfo goods, Coupon coupon) {
+        if (!coupon) {
+            return goods?.realPrice
+        }
+        if (goods?.yhEnable != 1) {
+            return goods?.realPrice
+        }
+        if (coupon?.type == 1) {
+            if (goods?.realPrice >= coupon.minMoney) {
+                return goods?.realPrice - coupon.yhMoney
+            }
+            return goods?.realPrice
+        } else if (coupon?.type == 2) {
+            return (goods?.realPrice * coupon.discount).round(2)
+        }
+        return goods?.realPrice
+    }
+
     def createOrder(Long machineId, String goodsJson, String yhCode) {
         def map = [:]
         def machine = VendMachineInfo.get(machineId)
         if (machine) {
             if (goodsJson) {
-                def jsonSlurper = new JsonSlurper()
-                def goodsList = jsonSlurper.parseText(goodsJson)
+                //优惠卷
+                def coupon = Coupon.findByCodeAndFlag(yhCode, 1 as Short)
+                //解析json
+                def goodsList = getGoodsList(goodsJson)
+                //获取优惠比例
+                def discount = calculateDiscount(goodsList, coupon)
                 //创建订单
                 def orderInfo = new OrderInfo()
                 orderInfo.vendMachine = machine
@@ -140,26 +173,45 @@ class OrderInfoService {
                 orderInfo.createTime = new Date()
                 orderInfo.orderMoney = 0
                 orderInfo.totalMoney = 0
+                orderInfo.youHuiJuan = 0
                 orderInfo.realMoney = 0
                 orderInfo.transNo = ""
+                if (coupon) {
+                    orderInfo.yhCode = yhCode
+                }
                 def goodsVoList = []
-                goodsList.each {
-                    def remainNum = Integer.valueOf(it.num)
-                    def goods = ThemeStoreGoodsInfo.get(Long.valueOf(it.gid))
+                def yhMoney = 0f
+                if (coupon?.type == 1) {
+                    yhMoney = coupon?.yhMoney
+                }
+                for (int i = 0; i < goodsList.size(); i++) {
+                    def num = goodsList.get(i).num
+                    def goods = goodsList.get(i).goods
                     def layers = VendLayerTrackGoods.findAllByVendMachineAndGoods(machine, goods)
+                    def realPrice = 0f
+                    if (coupon?.type == 2) {
+                        realPrice = (goods.realPrice * discount).round(2)
+                    } else if (coupon?.type == 1) {
+                        if (i != goodsList.size() - 1) {
+                            realPrice = (goods.realPrice * discount).round(2)
+                            yhMoney -= ((goods.realPrice - realPrice) * num).round(2)
+                        } else {
+                            realPrice = goods.realPrice - yhMoney / num
+                        }
+                    }
                     for (VendLayerTrackGoods layer: layers) {
                         if (layer.currentInventory < 1) {
                             continue//跳过空轨道
                         }
-                        def takeNum = Math.min(layer.currentInventory, remainNum)
+                        def takeNum = Math.min(layer.currentInventory, num)
                         //创建订单详情
                         def orderDetail = new OrderDetail()
                         orderDetail.order = orderInfo
                         orderDetail.goods = layer
                         orderDetail.goodsNum = takeNum
                         orderDetail.goodsPrice = layer.goods.realPrice * takeNum
-                        orderDetail.discount = 0
-                        orderDetail.buyPrice = layer.goods.realPrice * takeNum
+                        orderDetail.discount = discount
+                        orderDetail.buyPrice = realPrice * takeNum
                         orderDetail.goodsName = layer.goods.name
                         orderDetail.goodsSpec = layer.goods.specifications
                         orderDetail.goodsPic = layer.goods.picId
@@ -169,8 +221,8 @@ class OrderInfoService {
                         orderDetail.refundPrice = 0
                         orderDetail.save flush: true
                         //累加订单金额
-                        orderInfo.orderMoney += orderDetail.buyPrice
-                        orderInfo.totalMoney += orderDetail.buyPrice
+                        orderInfo.orderMoney += orderDetail.goodsPrice
+                        orderInfo.totalMoney += orderDetail.goodsPrice
                         orderInfo.realMoney += orderDetail.buyPrice
                         //构造返回结果
                         def goodsInfo = [:]//商品信息
@@ -184,12 +236,14 @@ class OrderInfoService {
                         goodsInfo.trackNo = layer.orbitalNo
                         goodsVoList.add(goodsInfo)
                         //检查数量
-                        remainNum = remainNum - takeNum
-                        if (remainNum < 1) {
+                        num = num - takeNum
+                        if (num < 1) {
                             break//己经分配完,跳出循环,进行下一个商品分配。
                         }
                     }
                 }
+                //计算总共优惠数量
+                orderInfo.youHuiJuan = orderInfo.totalMoney - orderInfo.realMoney
                 orderInfo.save flush: true
                 //订单信息
                 def order = [:]
@@ -201,6 +255,11 @@ class OrderInfoService {
                 map.orderInfo = order
                 map.success = true
                 map.msg = "下单成功"
+                //作废优惠卷
+                if (coupon) {
+                    coupon.flag = 0 as Short
+                    coupon.save flush: true
+                }
             } else {
                 map.success = false
                 map.msg = "参数不能为空"
@@ -210,6 +269,43 @@ class OrderInfoService {
             map.msg = "指定售卖机不存在"
         }
         return map
+    }
+
+    private getGoodsList(String goodsJSON) {
+        //解析json
+        def jsonSlurper = new JsonSlurper()
+        def goodsList = jsonSlurper.parseText(goodsJSON)
+        def goodsVoList = []
+        def goodsVo
+        goodsList.each {
+            def num = Integer.valueOf(it.num)
+            def goods = ThemeStoreGoodsInfo.get(Long.valueOf(it.gid))
+            goodsVo = [:]
+            goodsVo.num = num
+            goodsVo.goods = goods
+            goodsVoList.add(goodsVo)
+        }
+        goodsVoList
+    }
+
+    private calculateDiscount(List<Map> goodsList, Coupon coupon) {
+        if (!coupon) {
+            return 1
+        }
+        if (coupon.type == 2) {
+            return coupon.discount
+        }
+        if (coupon.type != 1) {
+            return 1
+        }
+        def sum = 0f
+        for (Map map: goodsList) {
+            sum += map.num * map.goods.realPrice
+        }
+        if (sum == 0) {
+            return 1
+        }
+        return coupon.yhMoney / sum
     }
 
     def updateOrderStatus(OrderInfo orderInfo, TransactionInfo transactionInfo, String transaction_no) {

@@ -18,6 +18,7 @@ class OrderInfo {
         quHuoCode nullable: true
         peiSongTime nullable: true
         quHuoTime nullable: true
+        yhCode nullable: true
     }
 
     VendMachineInfo vendMachine
@@ -36,16 +37,17 @@ class OrderInfo {
     Short getWay = 1 as Short //0:默认 未选 1:自己取 2:别人配送
 
     String transNo
-    Float orderMoney = 0
-    Float peiSongMoney = 0
-    Float totalMoney = 0
-    Float youHuiJuan = 0
-    Float userScore = 0
-    Float realMoney = 0
+    Float orderMoney = 0f
+    Float peiSongMoney = 0f
+    Float totalMoney = 0f
+    Float youHuiJuan = 0f
+    Float userScore = 0f
+    Float realMoney = 0f
     Date createTime
     Date confirmTime//支付时间
     Date completeTime//出货时间
     Date quHuoTime
     Date peiSongTime
     String quHuoCode
+    String yhCode = "" //优惠卷号码
 }

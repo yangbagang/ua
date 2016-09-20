@@ -19,5 +19,5 @@ class ThemeStoreGoodsInfo {
     Short status
     Integer px
     String letter
-    Short yhEnable = 0//是否可以有优惠
+    Short yhEnable//是否可以有优惠
 }
