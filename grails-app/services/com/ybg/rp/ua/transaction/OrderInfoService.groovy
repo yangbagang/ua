@@ -189,9 +189,11 @@ class OrderInfoService {
                     def goods = goodsList.get(i).goods
                     def layers = VendLayerTrackGoods.findAllByVendMachineAndGoods(machine, goods)
                     def realPrice = 0f
-                    if (coupon?.type == 2) {
+                    if (!coupon) {
+                        realPrice = goods.realPrice
+                    } else if (coupon.type == 2) {
                         realPrice = (goods.realPrice * discount).round(2)
-                    } else if (coupon?.type == 1) {
+                    } else if (coupon.type == 1) {
                         if (i != goodsList.size() - 1) {
                             realPrice = (goods.realPrice * discount).round(2)
                             yhMoney -= ((goods.realPrice - realPrice) * num).round(2)

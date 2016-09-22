@@ -44,11 +44,11 @@ class MsgPushHelper {
             ret = push.pushMessageToSingle(message, target);
         } catch (RequestException e) {
             e.printStackTrace();
-            //logger("调用个推服务异常，clientId: ${clientId}, content: ${content}", INFO);
+            println("调用个推服务异常，clientId: ${clientId}, content: ${content}");
             ret = push.pushMessageToSingle(message, target, e.getRequestId());
         }
         if (ret != null) {
-            //logger.info("ret  个推返回信息：" + ret.getResponse().toString());
+            println("ret  个推返回信息：" + ret.getResponse().toString());
             if (ret.getResponse().toString().contains("successed_online")
                     || ret.getResponse().toString().contains("successed_offline")) {
                 return true;

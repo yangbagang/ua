@@ -13,6 +13,8 @@ import groovy.json.JsonSlurper
 
 class VendMachineInfoController {
 
+    def vendMachineInfoService
+
     /**
      * 更新售卖机clientId及在线状态
      * @param vmCode 机器编号
@@ -401,4 +403,24 @@ class VendMachineInfoController {
         render map as JSON
     }
 
+    /**
+     * 显示设备在线情况
+     * @param token
+     * @return
+     */
+    def listMachine(String token) {
+        def map = [:]
+        if (PartnerUserUtil.checkTokenValid(token)){
+            def user = PartnerUserInfo.get(PartnerUserUtil.getPartnerUserIdFromToken(token))
+            def machineList = vendMachineInfoService.list(user)
+            //构造结果
+            map.success = true
+            map.machineList = machineList
+            map.message = ""
+        } else {
+            map.success = false
+            map.message = "为了您的账号安全，请重新登陆"
+        }
+        render map as JSON
+    }
 }

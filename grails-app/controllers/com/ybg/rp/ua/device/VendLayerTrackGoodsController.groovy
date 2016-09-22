@@ -1,5 +1,6 @@
 package com.ybg.rp.ua.device
 
+import com.ybg.rp.ua.partner.PartnerUserInfo
 import com.ybg.rp.ua.themeStore.ThemeStoreBaseInfo
 import com.ybg.rp.ua.themeStore.ThemeStoreGoodsInfo
 import com.ybg.rp.ua.utils.MsgPushHelper
@@ -393,6 +394,32 @@ class VendLayerTrackGoodsController {
                 map.goodsName = goods.name
             } else {
                 map.message = "该商品不存在"
+                map.success = false
+            }
+        } else {
+            map.success = false
+            map.message = "为了您的账号安全，请重新登陆"
+        }
+        render map as JSON
+    }
+
+    /**
+     * 列出有故障的轨道
+     * @param token
+     * @param machineId
+     * @return
+     */
+    def listNotWork(String token, Long machineId) {
+        def map = [:]
+        if (PartnerUserUtil.checkTokenValid(token)) {
+            def machine = VendMachineInfo.get(machineId)
+            if (machine) {
+                def dataList = vendLayerTrackGoodsService.layerOutOfService(machine)
+                map.message = ""
+                map.success = true
+                map.dataList = dataList
+            } else {
+                map.message = "设备不存在"
                 map.success = false
             }
         } else {

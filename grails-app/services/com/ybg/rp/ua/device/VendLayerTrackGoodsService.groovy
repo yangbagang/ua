@@ -194,4 +194,29 @@ class VendLayerTrackGoodsService {
         }
         results
     }
+
+    def layerOutOfService(VendMachineInfo machineInfo) {
+        //查询
+        def c = VendLayerTrackGoods.createCriteria()
+        def results = c.list {
+            projections {
+                vendMachine {
+                    property("machineCode")
+                }
+                goods {
+                    property("name")
+                }
+                property("id")
+                property("orbitalNo")
+                property("sellStatus")
+                property("currentInventory")
+                property("largestInventory")
+            }
+            and {
+                eq("vendMachine", machineInfo)
+                eq("workStatus", 0 as Short)
+            }
+        }
+        results
+    }
 }
