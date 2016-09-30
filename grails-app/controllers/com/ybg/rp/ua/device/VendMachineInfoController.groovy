@@ -423,4 +423,22 @@ class VendMachineInfoController {
         }
         render map as JSON
     }
+
+    /**
+     * 检查是否存在指定编号的设备
+     * @param vmCode
+     * @return
+     */
+    def checkVMCode(String vmCode) {
+        def map = [:]
+        def machine = VendMachineInfo.findByMachineCode(vmCode)
+        if (machine) {
+            map.success = true
+            map.message = "编号正确"
+        } else {
+            map.success = false
+            map.message = "编号不存在"
+        }
+        render map as JSON
+    }
 }
