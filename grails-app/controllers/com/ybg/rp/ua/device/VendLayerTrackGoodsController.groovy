@@ -428,4 +428,16 @@ class VendLayerTrackGoodsController {
         }
         render map as JSON
     }
+
+    /**
+     * 获取主题店商品库,方便线上购买。
+     * @param token
+     * @param storeId
+     */
+    def listStoreGoods(String openid, Long storeId) {
+        def themeStore = ThemeStoreBaseInfo.get(storeId)
+        def machine = VendMachineInfo.findByThemeStore(themeStore)
+        def goods = vendLayerTrackGoodsService.listAllGoodsByMachine(machine)
+        render(view: "goods", model: [goods: goods])
+    }
 }

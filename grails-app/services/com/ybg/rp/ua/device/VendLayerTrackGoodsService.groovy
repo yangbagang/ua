@@ -75,12 +75,14 @@ class VendLayerTrackGoodsService {
         }
     }
 
+    @Transactional(readOnly = true)
     def getEmptyDoorTrasckNos(Long sid) {
         def trackInfo = VendLayerTrackInfo.get(sid)
         def trackGoodsList = VendLayerTrackGoods.findAllByVendMachineAndLayerAndCurrentInventory(trackInfo.vendMachine, trackInfo.layer, 0)
         trackGoodsList*.orbitalNo
     }
 
+    @Transactional(readOnly = true)
     def getGoodsNumByLayerId(Long lid) {
         VendLayerTrackGoods.get(lid)?.currentInventory
     }
@@ -99,6 +101,7 @@ class VendLayerTrackGoodsService {
         }
     }
 
+    @Transactional(readOnly = true)
     def queryGoodsByTypeOne(Long machineId, Long typeOneId, Integer pageNum, Integer pageSize) {
         def map = [:]
         //准备参数
@@ -215,6 +218,24 @@ class VendLayerTrackGoodsService {
             and {
                 eq("vendMachine", machineInfo)
                 eq("workStatus", 0 as Short)
+            }
+        }
+        results
+    }
+
+    def listAllGoodsByMachine(VendMachineInfo machineInfo) {
+        //查询
+        def c = VendLayerTrackGoods.createCriteria()
+        def results = c.list {
+            projections {
+                sum("currentInventory")
+                sum("largestInventory")
+                groupProperty("goods")
+            }
+            and {
+                eq("vendMachine", machineInfo)
+                gt("currentInventory", 0)
+                isNotNull("goods")
             }
         }
         results

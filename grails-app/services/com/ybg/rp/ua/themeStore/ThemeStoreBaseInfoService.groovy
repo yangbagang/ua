@@ -43,4 +43,14 @@ class ThemeStoreBaseInfoService {
         }
         list
     }
+
+    def getStores(String name) {
+        def stores = []
+        if (name) {
+            stores = ThemeStoreBaseInfo.findAllByStatusAndNameLike(1 as Short, "%${name}%")
+        } else {
+            stores = ThemeStoreBaseInfo.findAllByStatus(1 as Short)
+        }
+        stores
+    }
 }

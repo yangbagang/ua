@@ -9,9 +9,9 @@ class PartnerUserUtil {
 
     private static Map container = [:]
 
-    static {
-        container.put(8L, "e07e054dfc57bf5401088582da1feba9631ab0732f82ad0fbd92b388b1e1d696")
-    }
+//    static {
+//        container.put(8L, "e07e054dfc57bf5401088582da1feba9631ab0732f82ad0fbd92b388b1e1d696")
+//    }
 
     public static String createUserTokenFromId(Long partnerUserId) {
         def token = DigestUtils.sha256Hex("${System.currentTimeMillis()}-partner-user")

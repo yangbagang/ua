@@ -1,5 +1,7 @@
 package com.ybg.rp.ua.user
 
+import com.ybg.rp.ua.partner.PartnerUserInfo
+
 class Feedback {
 
     static constraints = {
@@ -27,4 +29,11 @@ class Feedback {
     Date updateTime//处理时间
     String result//具体处理方式
     Short flag=0//标志位，是否处理。0未处理1己处理
+
+    transient String partnerUserName
+
+    String getPartnerUserName() {
+        PartnerUserInfo.get(partnerUserId)?.realName
+    }
+
 }

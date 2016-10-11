@@ -31,4 +31,12 @@ class ThemeStoreBaseInfoController {
         render map as JSON
     }
 
+    /**
+     * 列出正在营业的主题店。for weixin
+     * @param name
+     */
+    def listStores(String name) {
+        def stores = themeStoreBaseInfoService.getStores(name)
+        render(view: "list", model: [stores: stores])
+    }
 }
