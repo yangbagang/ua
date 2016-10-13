@@ -29,6 +29,18 @@ class ShoppingCartService {
         }
     }
 
+    def getGoodsNumAndMoney(String openid, Map map) {
+        def num = 0
+        def money = 0d
+        def cartList = listGoods(openid)
+        cartList.each { cart ->
+            num += cart.num
+            money += cart.num * cart.goodsInfo.realPrice
+        }
+        map.num = num
+        map.money = money.round(2)
+    }
+
     /**
      * 列出购物车商品
      * @param openid

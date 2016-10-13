@@ -438,6 +438,6 @@ class VendLayerTrackGoodsController {
         def themeStore = ThemeStoreBaseInfo.get(storeId)
         def machine = VendMachineInfo.findByThemeStore(themeStore)
         def goods = vendLayerTrackGoodsService.listAllGoodsByMachine(machine)
-        render(view: "goods", model: [goods: goods])
+        render(view: "goods", model: [goods: goods, themeStore: themeStore])
     }
 }
