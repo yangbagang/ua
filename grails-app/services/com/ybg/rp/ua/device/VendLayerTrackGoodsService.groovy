@@ -16,7 +16,7 @@ class VendLayerTrackGoodsService {
 
     @Transactional(readOnly = true)
     def getCabinetListByMachine(VendMachineInfo machineInfo) {
-        VendLayerTrackInfo.findAllByVendMachineAndIsCabinet(machineInfo, 1 as Short, [sort: "layer", order: "asc"])
+        VendLayerTrackInfo.findAllByVendMachineAndIsCabinetGreaterThan(machineInfo, 0 as Short, [sort: "layer", order: "asc"])
     }
 
     @Transactional(readOnly = true)

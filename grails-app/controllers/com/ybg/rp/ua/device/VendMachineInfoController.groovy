@@ -128,11 +128,11 @@ class VendMachineInfoController {
                         goods.currentInventory = 0
                         goods.largestInventory = it.maxInventory
                         goods.workStatus = 1 as Short
-                        if (it.layerNo in ["1", "2", "3", "4", "5", "6"]) {//特殊数字,设定为格子柜。
+                        if (layerNo in ["1", "2", "3", "4", "5", "6"]) {//特殊数字,设定为格子柜。
                             goods.isCabinet = 1 as Short
                         } else {
                             def match = ~/(A|B|C|D).*/
-                            if (it.layerNo ==~ match) {//字母,设定为副柜。
+                            if (layerNo ==~ match) {//字母,设定为副柜。
                                 goods.isCabinet = 2 as Short
                             } else {
                                 goods.isCabinet = 0 as Short
