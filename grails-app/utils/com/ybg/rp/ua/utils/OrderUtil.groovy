@@ -7,7 +7,7 @@ import java.text.SimpleDateFormat
  */
 class OrderUtil {
 
-    public static String createOrderNo() {
+    static String createOrderNo() {
         def sdf = new SimpleDateFormat("yyyyMMddHHmmssSSSS")
         sdf.format(new Date())
     }

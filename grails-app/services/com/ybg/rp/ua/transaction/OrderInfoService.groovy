@@ -9,6 +9,7 @@ import com.ybg.rp.ua.partner.PartnerUserStore
 import com.ybg.rp.ua.themeStore.ThemeStoreBaseInfo
 import com.ybg.rp.ua.themeStore.ThemeStoreGoodsInfo
 import com.ybg.rp.ua.themeStore.ThemeStoreOfPartner
+import com.ybg.rp.ua.utils.CouponUtil
 import com.ybg.rp.ua.utils.DateUtil
 import com.ybg.rp.ua.utils.OrderUtil
 import grails.transaction.Transactional
@@ -64,6 +65,9 @@ class OrderInfoService {
                 if (layer.currentInventory > 0) {
                     //优惠卷
                     def coupon = Coupon.findByCodeAndFlag(yhCode, 1 as Short)
+                    if (!CouponUtil.checkIsValid(coupon)) {
+                        coupon = null//如果不适用，则置空。
+                    }
                     //创建订单
                     def orderInfo = new OrderInfo()
                     orderInfo.vendMachine = machine
@@ -119,7 +123,11 @@ class OrderInfoService {
                     map.msg = "下单成功"
                     //优惠卷己经使用
                     if (coupon) {
-                        coupon.flag = 0 as Short
+                        //剩余次数减一
+                        coupon.maxCount = coupon.maxCount - 1
+                        if (coupon.maxCount < 1) {
+                            coupon.flag = 0 as Short
+                        }
                         coupon.save(flush: true)
                     }
                 } else {
@@ -137,7 +145,7 @@ class OrderInfoService {
         return map
     }
 
-    private Float getRealPrice(ThemeStoreGoodsInfo goods, Coupon coupon) {
+    private static Float getRealPrice(ThemeStoreGoodsInfo goods, Coupon coupon) {
         if (!coupon) {
             return goods?.realPrice
         }
@@ -162,6 +170,9 @@ class OrderInfoService {
             if (goodsJson) {
                 //优惠卷
                 def coupon = Coupon.findByCodeAndFlag(yhCode, 1 as Short)
+                if (!CouponUtil.checkIsValid(coupon)) {
+                    coupon = null//如果不适用，则置空。
+                }
                 //解析json
                 def goodsList = getGoodsList(goodsJson)
                 //获取优惠比例
@@ -189,8 +200,8 @@ class OrderInfoService {
                     def goods = goodsList.get(i).goods
                     def layers = VendLayerTrackGoods.findAllByVendMachineAndGoods(machine, goods)
                     def realPrice = 0f
-                    if (!coupon) {
-                        realPrice = goods.realPrice
+                    if (!coupon || goods.yhEnable != 1) {
+                        realPrice = goods.realPrice//不存在优惠券或者商品不参加优惠活动，则返回原价。
                     } else if (coupon.type == 2) {
                         realPrice = (goods.realPrice * discount).round(2)
                     } else if (coupon.type == 1) {
@@ -259,7 +270,11 @@ class OrderInfoService {
                 map.msg = "下单成功"
                 //作废优惠卷
                 if (coupon) {
-                    coupon.flag = 0 as Short
+                    //剩余次数减一
+                    coupon.maxCount = coupon.maxCount - 1
+                    if (coupon.maxCount < 1) {
+                        coupon.flag = 0 as Short
+                    }
                     coupon.save flush: true
                 }
             } else {
