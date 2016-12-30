@@ -8,6 +8,9 @@ import com.ybg.rp.ua.marketing.Coupon
 class CouponUtil {
 
     static checkIsValid(Coupon coupon) {
+        if (coupon == null) {
+            return false
+        }
         def calendar = Calendar.getInstance(Locale.CHINA)
         if (coupon.dayOfWeek != 0 && coupon.dayOfWeek != calendar.get(Calendar.DAY_OF_WEEK)) {
             return false
