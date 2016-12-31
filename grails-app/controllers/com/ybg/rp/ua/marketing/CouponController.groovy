@@ -16,7 +16,7 @@ class CouponController {
             def coupon = Coupon.findByCode(code)
             if (coupon) {
                 if (coupon.flag == Short.valueOf("1")) {
-                    if (CouponUtil.checkIsValid(coupon)) {
+                    if (!CouponUtil.checkIsValid(coupon)) {
                         map.success = false
                         map.msg = "当前不可用"
                     } else {
@@ -37,6 +37,19 @@ class CouponController {
             map.msg = "编号不能为空"
         }
         render map as JSON
+    }
+
+    def check2() {
+        def calendar1 = Calendar.getInstance(Locale.CHINA)
+        def calendar2 = Calendar.getInstance(Locale.default)
+        def calendar3 = Calendar.getInstance(Locale.CHINESE)
+        def w1 = calendar1.get(Calendar.DAY_OF_WEEK)
+        def w2 = calendar2.get(Calendar.DAY_OF_WEEK)
+        def w3 = calendar3.get(Calendar.DAY_OF_WEEK)
+        println "DAY_OF_WEEK in china is: ${w1}"
+        println "DAY_OF_WEEK in default is: ${w2}"
+        println "DAY_OF_WEEK in chinese is: ${w3}"
+        render "in china ${w1}, in default ${w2}, in chinese ${w3}"
     }
 
 }
