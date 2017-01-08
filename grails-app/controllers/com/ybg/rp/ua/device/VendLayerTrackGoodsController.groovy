@@ -431,7 +431,7 @@ class VendLayerTrackGoodsController {
 
     /**
      * 获取主题店商品库,方便线上购买。
-     * @param token
+     * @param openid
      * @param storeId
      */
     def listStoreGoods(String openid, Long storeId) {

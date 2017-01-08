@@ -15,15 +15,15 @@
 
 <body onload="getGoodsNumAndMoney('${params.openid}');">
 <div class="page-content goods_list_bg">
-    <div class="content-block">
-        <div class="content-block-title">所有商品</div>
+    <div class="goods_list_content">
         <g:each status="i" var="g" in="${goods}">
             <g:if test="${i % 2 == 0}">
                 <div class="row goods_list">
             </g:if>
             <div class="col-50 goods_card">
                 <span class="goods_img">
-                    <g:img dir="images" file="default.png"/>
+                    <img src="${com.ybg.rp.ua.utils.Constants.PIC_SERVER}${g[2].picId}"
+                            onerror="javascript:this.src='/ua/assets/default_pic.png'" >
                 </span>
                 <h4 class="goods_title">${g[2].name}</h4>
 
@@ -33,9 +33,9 @@
                 </div>
 
                 <p class="buttons-row">
-                    <input type="button" class="button button-raised button-fill color-cyan ripple-pink" value="添加"
+                    <input type="button" class="button button-raised button-fill color-red ripple-pink" value="购买"
                            onclick="addToCart('${params.openid}', ${g[2].id});">
-                    <input type="button" class="button button-raised button-fill color-teal ripple-yellow" value="详情"
+                    <input type="button" class="button button-raised button-fill color-amber ripple-yellow" value="详情"
                            onclick="buySingleGoods('${params.openid}', ${g[2].id});">
                 </p>
             </div>
