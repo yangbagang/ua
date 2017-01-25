@@ -121,6 +121,11 @@ class OrderInfoController {
      */
     def queryOrderIsPay(String orderSn) {
         def map = [:]
+        map.success = true
+        map.isPay = true
+        map.deliveryStatus = 0
+        map.payWay = 2
+        map.msg = ""
         def orderInfo = OrderInfo.findByOrderNo(orderSn)
         if (orderInfo) {
             if (orderInfo.payStatus == (1 as Short)) {//己经支付
