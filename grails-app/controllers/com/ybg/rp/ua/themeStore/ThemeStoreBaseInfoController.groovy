@@ -39,4 +39,16 @@ class ThemeStoreBaseInfoController {
         def stores = themeStoreBaseInfoService.getStores(name)
         render(view: "list", model: [stores: stores])
     }
+
+    /**
+     * 列出正在营业的主题店。for 小程序
+     * @param name
+     * @param latitude
+     * @param longitude
+     */
+    def listStoresJson(String name, Double latitude, Double longitude) {
+        def map = themeStoreBaseInfoService.findThemeStore2(name, latitude, longitude)
+        render map as JSON
+    }
+
 }

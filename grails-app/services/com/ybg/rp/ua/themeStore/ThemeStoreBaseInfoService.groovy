@@ -30,14 +30,29 @@ class ThemeStoreBaseInfoService {
         map
     }
 
-    private createVoList(List<ThemeStoreBaseInfo> themeStoreBaseInfos, String name, Double latitude, Double longitude) {
+    def findThemeStore2(String name, Double latitude, Double longitude) {
+        def map = [:]
+        //计算数量
+        def themeStores = getStores(name)
+        def voList = createVoList(themeStores, name, latitude, longitude)
+        voList?.sort {it.distance}
+        //生成结果
+        map.dataList = voList
+        map.totalCount = voList?.size()
+        map.success = true
+        map.msg = ""
+        map
+    }
+
+    private createVoList(List<ThemeStoreBaseInfo> themeStoreBaseInfoList, String name, Double latitude, Double longitude) {
         def list = []
-        for (ThemeStoreBaseInfo storeBaseInfo : themeStoreBaseInfos) {
+        for (ThemeStoreBaseInfo storeBaseInfo : themeStoreBaseInfoList) {
             if (name == null || "" == name || storeBaseInfo.name.contains(name)) {
                 def storeVo = new ThemeStoreVo()
                 storeVo.id = storeBaseInfo.id
                 storeVo.name = storeBaseInfo.name
                 storeVo.address = storeBaseInfo.building.address
+                storeVo.distance = GPSUtil.getDistance(latitude, longitude, storeBaseInfo.latitude, storeBaseInfo.longitude)
                 list.add(storeVo)
             }
         }
