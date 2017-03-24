@@ -132,6 +132,7 @@ class VendLayerTrackGoodsService {
             def vo = [:]
             vo.gid = goodsInfo.id
             vo.kucun = num
+            vo.num = 0
             vo.price = goodsInfo.realPrice
             vo.goodsName = goodsInfo.name
             vo.goodsDesc = goodsInfo.specifications

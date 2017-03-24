@@ -440,4 +440,18 @@ class VendLayerTrackGoodsController {
         def goods = vendLayerTrackGoodsService.listAllGoodsByMachine(machine)
         render(view: "goods", model: [goods: goods, themeStore: themeStore])
     }
+
+    /**
+     * 获取主题店商品库,方便小程序购买。
+     * @param storeId
+     * @param typeOne
+     */
+    def listStoreGoodsByTypeOne(Long storeId, Long typeOne) {
+        println "storeId=${storeId}, typeOne=${typeOne}"
+        def themeStore = ThemeStoreBaseInfo.get(storeId)
+        def machine = VendMachineInfo.findByThemeStore(themeStore)
+        def map = vendLayerTrackGoodsService.queryGoodsByTypeOne(machine.id, typeOne, 1, 10000)
+        render map as JSON
+    }
+
 }
