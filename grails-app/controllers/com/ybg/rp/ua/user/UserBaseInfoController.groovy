@@ -40,8 +40,8 @@ class UserBaseInfoController {
      * @return
      */
     def getOpenId(String code) {
-        def APPID = ""
-        def SECRET = ""
+        def APPID = "wxb1d7e9f4bbdb7bc5"
+        def SECRET = "0579e71aaa1c4b8961ef6de577929717"
         def url = "https://api.weixin.qq.com/sns/jscode2session?appid="+APPID+"&secret="+SECRET+"&js_code="+code+"&grant_type=authorization_code"
         def map = url.toURL().text
         render map as JSON
