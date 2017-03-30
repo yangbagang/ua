@@ -1,5 +1,7 @@
 package com.ybg.rp.ua.user
 
+import grails.converters.JSON
+
 class UserBaseInfoController {
 
     def userBaseInfoService
@@ -30,5 +32,18 @@ class UserBaseInfoController {
 
     def view() {
         render(view: "phoneUpdate")
+    }
+
+    /**
+     * 获取微信openid
+     * @param code
+     * @return
+     */
+    def getOpenId(String code) {
+        def APPID = ""
+        def SECRET = ""
+        def url = "https://api.weixin.qq.com/sns/jscode2session?appid="+APPID+"&secret="+SECRET+"&js_code="+code+"&grant_type=authorization_code"
+        def map = url.toURL().text
+        render map as JSON
     }
 }
